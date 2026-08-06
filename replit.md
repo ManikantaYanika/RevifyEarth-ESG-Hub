@@ -1,6 +1,6 @@
-# [Project name]
+# RevifyEarth
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+RevifyEarth is the official website for Revify Private Limited, presenting its ESG branding and sustainability communication services to enterprise organizations.
 
 ## Run & Operate
 
@@ -22,23 +22,33 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/revifyearth/src/App.tsx` — one-page site structure, content, navigation, and interactions.
+- `artifacts/revifyearth/src/index.css` — RevifyEarth visual tokens, typography, responsive styling, motion, and reduced-motion behavior.
+- `artifacts/revifyearth/public/assets/revify/` — official mark, proposal imagery, and team portraits extracted from the supplied proposal PDF.
+- `attached_assets/Sagility_Proposal_2026_(1)_1786013304086.pdf` — source proposal used for verified company/service/team/contact content.
+- `attached_assets/Pasted-You-are-an-Elite-Product-Designer-Creative-Director-Bra_1786013313843.txt` — website brief and quality requirements.
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The public site is presentation-first and intentionally does not surface the Sagility proposal's commercial fee as a generic RevifyEarth price.
+- The site uses a single anchored narrative so visitors can move from positioning to services, proof of expertise, team, and contact without losing context.
+- Proposal photography and the extracted official RevifyEarth mark are reused directly rather than recreated or replaced.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Premium ESG branding and sustainability communication company website.
+- Service overview covering gap assessment, report design, print, board presentations, video reports, web development, and integrated ESG communication.
+- Process, ESG expertise, team, and verified contact details with responsive navigation and a video-report approach modal.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Use only verified source content from uploaded company material; mark unavailable information as a placeholder rather than inventing it.
+- Preserve official company assets exactly as provided.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Use `pnpm --filter @workspace/revifyearth run typecheck` for the frontend check.
+- Keep `PORT` and `BASE_PATH` workflow-provided; do not run the frontend directly without them.
 
 ## Pointers
 

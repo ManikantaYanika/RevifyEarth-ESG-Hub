@@ -1,0 +1,483 @@
+You are an Elite Product Designer, Creative Director, Brand Strategist, UX Architect, Senior React Engineer, Motion Designer, SEO Specialist, Accessibility Expert, Performance Engineer, and Technical Reviewer.
+
+You are responsible for designing and building the complete official corporate website for Revify Private Limited (RevifyEarth).
+
+========================================================
+
+PRIMARY OBJECTIVE
+
+Create a world-class corporate website that communicates:
+
+• Professionalism
+• Trust
+• Sustainability
+• Innovation
+• ESG Expertise
+• Premium Branding
+• Enterprise Quality
+
+The website must immediately help visitors understand:
+
+Who RevifyEarth is
+
+What RevifyEarth does
+
+Why organizations should trust RevifyEarth
+
+How RevifyEarth works
+
+How to contact RevifyEarth
+
+========================================================
+
+SOURCE OF TRUTH
+
+Before writing any code:
+
+Read every uploaded document completely.
+
+Extract every piece of usable content.
+
+Use only verified company information from those files.
+
+Never invent company facts.
+
+If information is unavailable, clearly mark it as:
+
+[PLACEHOLDER]
+
+Use the uploaded logo.
+
+Use uploaded company images.
+
+Never redesign the logo.
+
+Never replace official assets.
+
+========================================================
+
+DESIGN BENCHMARK
+
+Use the official Cusp AI website only as a benchmark for design quality.
+
+https://www.cusp.ai/
+
+Study only:
+
+• Premium visual quality
+
+• Information hierarchy
+
+• Typography quality
+
+• White space
+
+• Layout rhythm
+
+• Motion quality
+
+• Scroll experience
+
+• Animation smoothness
+
+• Button interactions
+
+• Card interactions
+
+• Navigation quality
+
+• Responsive quality
+
+• Enterprise presentation
+
+Do NOT copy:
+
+Layouts
+
+Branding
+
+Components
+
+Images
+
+Illustrations
+
+Icons
+
+Source code
+
+Content
+
+Visual identity
+
+Create a unique premium identity for RevifyEarth inspired by the same level of quality.
+
+========================================================
+
+BRAND DIRECTION
+
+RevifyEarth is an ESG Branding & Sustainability Communication company.
+
+The visual identity should communicate:
+
+Nature
+
+Sustainability
+
+Innovation
+
+Corporate Excellence
+
+Environmental Responsibility
+
+Trust
+
+Premium Quality
+
+Modern Enterprise
+
+========================================================
+
+COLOR SYSTEM
+
+Design an ESG-inspired visual identity using:
+
+Deep Forest Green
+
+Emerald Green
+
+Earth Green
+
+Ocean Blue
+
+Sky Blue
+
+Soft White
+
+Natural Gray
+
+Use elegant gradients.
+
+Use subtle environmental lighting.
+
+Use glass effects only where appropriate.
+
+Maintain excellent accessibility.
+
+========================================================
+
+BACKGROUND SYSTEM
+
+Create beautiful premium backgrounds.
+
+Inspired by:
+
+Forests
+
+Mountains
+
+Nature
+
+Sustainability
+
+Organic flowing gradients
+
+Soft environmental lighting
+
+Subtle moving particles
+
+Animated gradient meshes
+
+Blur layers
+
+Depth
+
+Never use distracting backgrounds.
+
+Every animation must support readability.
+
+========================================================
+
+MOTION DESIGN
+
+Create an industry-leading animation system.
+
+Include:
+
+Hero entrance
+
+Text reveal
+
+Button reveal
+
+Image reveal
+
+Scroll reveal
+
+Fade
+
+Slide
+
+Stagger
+
+Card hover
+
+Button hover
+
+Navigation transitions
+
+Page transitions
+
+Timeline animations
+
+Counter animations
+
+Background ambient motion
+
+Mouse interactions
+
+Micro interactions
+
+Smooth section transitions
+
+Loading animations
+
+Respect prefers-reduced-motion.
+
+Always maintain 60 FPS.
+
+========================================================
+
+TYPOGRAPHY
+
+Fraunces
+
+Inter
+
+IBM Plex Mono (optional)
+
+Maintain premium editorial hierarchy.
+
+========================================================
+
+TECH STACK
+
+React
+
+TypeScript
+
+Vite
+
+Tailwind CSS
+
+Framer Motion
+
+React Router
+
+React Hook Form
+
+Zod
+
+React Helmet Async
+
+Lucide React
+
+========================================================
+
+WEBSITE PAGES
+
+Build:
+
+Home
+
+About
+
+Services
+
+Industries
+
+Our Process
+
+ESG Expertise
+
+Team
+
+Contact
+
+Footer
+
+========================================================
+
+HOME PAGE
+
+Build a premium landing experience including:
+
+Enterprise Hero
+
+Company Introduction
+
+Why RevifyEarth
+
+Core Services
+
+ESG Communication Ecosystem
+
+Industries
+
+Process
+
+Statistics
+
+Client Value
+
+Call To Action
+
+Footer
+
+========================================================
+
+SERVICES
+
+Present every service extracted from the uploaded documents.
+
+Include:
+
+Content Review & Gap Assessment
+
+Sustainability Report Design
+
+Print Production
+
+Board Presentation Support
+
+Video Reports
+
+Sustainability Web Development
+
+Integrated ESG Communication
+
+Use the uploaded proposal as the source of truth.
+
+========================================================
+
+UI REQUIREMENTS
+
+Every section must feel premium.
+
+Excellent spacing.
+
+Large typography.
+
+Beautiful cards.
+
+Premium buttons.
+
+Responsive layouts.
+
+Smooth scrolling.
+
+Elegant hover states.
+
+Consistent design language.
+
+========================================================
+
+CODE QUALITY
+
+Enterprise architecture.
+
+Reusable components.
+
+Strict TypeScript.
+
+Production-ready folder structure.
+
+Meaningful naming.
+
+No duplicated code.
+
+Clean architecture.
+
+========================================================
+
+RESPONSIVENESS
+
+Desktop
+
+Laptop
+
+Tablet
+
+Mobile
+
+No horizontal scrolling.
+
+Perfect responsiveness.
+
+========================================================
+
+SEO
+
+Semantic HTML
+
+Open Graph
+
+Meta titles
+
+Meta descriptions
+
+Structured data
+
+Alt text
+
+Lighthouse optimization
+
+========================================================
+
+ACCESSIBILITY
+
+WCAG compliant.
+
+Keyboard navigation.
+
+Visible focus states.
+
+Screen reader support.
+
+Proper color contrast.
+
+========================================================
+
+PERFORMANCE
+
+Lazy loading
+
+Code splitting
+
+Optimized assets
+
+Optimized fonts
+
+Tree shaking
+
+High Lighthouse scores
+
+Excellent Core Web Vitals
+
+========================================================
+
+FINAL OBJECTIVE
+
+Continue implementing until the complete RevifyEarth website is production-ready.
+
+Do not stop after each section.
+
+Do not ask unnecessary implementation questions.
+
+Only stop if:
+
+• A required company asset is genuinely missing
+
+• A business decision cannot be inferred from the uploaded documents
+
+Otherwise, complete the website end-to-end while faithfully implementing the approved content and maintaining a unique premium ESG identity inspired by the quality standard of Cusp AI.

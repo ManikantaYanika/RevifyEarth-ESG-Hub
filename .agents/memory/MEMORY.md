@@ -1,0 +1,1 @@
+- [RevifyEarth source-of-truth](revifyearth-source.md) — supplied proposal and brief govern public claims, assets, and client-specific commercial boundaries.

@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "RevifyEarth"
+description = "A premium ESG branding and sustainability communications website for Revify Private Limited, presenting its integrated services, methodology, team, and contact pathway for enterprise organizations."
+version = "1.0.0"
+id = "artifacts/revifyearth"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22205
+
+[services.development]
+run = "pnpm --filter @workspace/revifyearth run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/revifyearth", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/revifyearth/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22205"
+BASE_PATH = "/"
