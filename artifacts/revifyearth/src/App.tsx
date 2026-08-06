@@ -1,225 +1,106 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ArrowDownRight, ArrowUpRight, Check, ChevronDown, ExternalLink, Instagram, Linkedin, Menu, MessageCircle, Play, Send, X } from "lucide-react";
-import { FormEvent, ReactNode, useEffect, useState } from "react";
-import { Link, Route, Switch, Router as WouterRouter, useLocation } from "wouter";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Suspense, lazy } from 'react';
+import { Route, Switch, Router as WouterRouter } from 'wouter';
+
+import { Toaster } from '@/components/ui/toaster';
+import { TooltipProvider } from '@/components/ui/tooltip';
+
+import { Assistant } from '@/components/layout/Assistant';
+import { PageMeta, ScrollProgress, ScrollToTop, SkipLink } from '@/components/layout/Chrome';
+import { Footer } from '@/components/layout/Footer';
+import { Header } from '@/components/layout/Header';
+import { Home } from '@/pages/Home';
 
 const queryClient = new QueryClient();
-const asset = (name: string) => `/assets/revify/${name}`;
 
-const nav = [["About","/about"],["Services","/services"],["ESG Expertise","/expertise"],["Sustainability Branding","/sustainability-branding"],["Industries","/industries"],["Process","/process"],["Team","/team"],["Projects","/projects"]] as const;
-const services = [
-  ["01","Content Review & Gap Assessment","A chapter-by-chapter review to turn disclosure gaps, inconsistencies and fragmented narratives into a clear reporting foundation."],
-  ["02","Sustainability Report Design","A distinctive editorial system with five creative theme directions, custom visualisations and iterative reviews."],
-  ["03","Sustainable Print Production","FSC-certified and/or recycled paper options, proofing and considered production for a report that feels as responsible as its content."],
-  ["04","Board Presentation Support","An executive-level presentation distilling reporting-year highlights, key indicators and strategic forward-looking priorities."],
-  ["05","Video Report","A 5–7 minute visual narrative with script, storyboard, motion graphics, animated KPIs, voice-over where included and Full HD output."],
-  ["06","Sustainability Report Webpage Development","A responsive digital home for the report, from sustainability overview and thematic content to video and downloadable access."],
-  ["07","Integrated ESG Communication","One coherent strategy moving from technical review to report, print, video and web — without losing the thread."],
-] as const;
-const team = [
-  ["Pallavi Priya","CEO and ESG Industry Expert","10+ years of industry experience in ESG, Past Ex-Coal India, EY, Asian Paints. BTech in Environment from IITD, MBA in Sustainability from IIML.","team-pallavi.png"],
-  ["Ananya A","CFO and ESG Industry Expert","10+ years of experience in consulting & Quality Assurance. BTech in Electrical from ITER; MBA in Sustainability from IIML.","team-ananya.png"],
-  ["Bichitra Nanda","Director","Retd. Civil Servant, Govt. of Odisha.","team-bichitra.png"],
-  ["Sanskar","Marketing & Content Head","","team-sanskar.png"],
-  ["Sheetal","Report Designer & Content Creator","","team-sheetal.png"],
-  ["Yanika Manikantha","Web-Developer","","team-yanika.png"],
-] as const;
-const expertise = [
-  ["ESG Expertise","Sustainability reporting frameworks, climate disclosures, ESG strategy and environmental performance."],
-  ["Integrated Communication","Technical review and report design to multimedia communication and digital experiences under one strategy."],
-  ["Strategic Storytelling","Transform technical sustainability information into meaningful narratives."],
-  ["Long-term Partnership","Continuity, consistency and fresh perspectives each reporting cycle."],
-  ["Premium Creative Design","Editorial design, infographics, data visualisation and stakeholder-centric design."],
-] as const;
-const industries = [
-  ["Built environment","For organisations shaping the places, infrastructure and systems people depend on.","volcano.jpg"],
-  ["Energy & resources","For organisations translating operational complexity into accountable progress.","mountain-sunset.jpg"],
-  ["People-led enterprises","For organisations making the social and human dimensions of value visible.","forest-mist.jpg"],
-];
-const serviceDetails: Record<string, { overview: string; deliverables: string[]; bestFor: string }> = {
-  "Content Review & Gap Assessment": {
-    overview: "We bring structure to the reporting foundation before design begins, identifying where evidence, narrative and disclosure need more clarity.",
-    deliverables: ["Chapter-by-chapter review", "Gap and inconsistency map", "Priority questions for data owners", "Clear reporting foundation"],
-    bestFor: "Teams preparing a sustainability report or strengthening an existing disclosure cycle.",
-  },
-  "Sustainability Report Design": {
-    overview: "We translate reporting content into an editorial system that makes complex information easier to understand, navigate and remember.",
-    deliverables: ["Five creative theme directions", "Editorial layout system", "Custom visualisations", "Iterative review rounds"],
-    bestFor: "Organisations that want their report to feel authoritative, distinctive and useful to stakeholders.",
-  },
-  "Sustainable Print Production": {
-    overview: "We carry the sustainability story into the physical report through considered material choices, proofing and production support.",
-    deliverables: ["FSC-certified and/or recycled paper options", "Print-ready artwork", "Proofing coordination", "Production guidance"],
-    bestFor: "Teams creating a premium printed report without losing sight of responsible production.",
-  },
-  "Board Presentation Support": {
-    overview: "We distil the reporting year into an executive-level presentation that keeps the important indicators and forward priorities in focus.",
-    deliverables: ["Executive narrative structure", "Reporting-year highlights", "Key indicator selection", "Strategic forward-looking priorities"],
-    bestFor: "Leadership teams that need a confident, concise way to take sustainability work into the boardroom.",
-  },
-  "Video Report": {
-    overview: "We give the reporting year a wider life through a concise visual narrative designed for attention, clarity and reach.",
-    deliverables: ["Narrative and creative concept", "Script and storyboard", "Motion graphics and animated KPIs", "Full HD output"],
-    bestFor: "Organisations looking to make sustainability information more accessible across internal and external audiences.",
-  },
-  "Sustainability Report Webpage Development": {
-    overview: "We create a responsive digital home for the report so people can move naturally between overview, thematic content, video and download access.",
-    deliverables: ["Sustainability overview", "Thematic content structure", "Video and downloadable access", "Responsive webpage experience"],
-    bestFor: "Teams that want their report to be discoverable, shareable and easy to explore on every device.",
-  },
-  "Integrated ESG Communication": {
-    overview: "We connect technical review, report, print, presentation, video and web into one coherent communication system.",
-    deliverables: ["Integrated engagement direction", "Shared narrative architecture", "Consistent visual language", "Connected stakeholder touchpoints"],
-    bestFor: "Organisations ready to move beyond a single document and build a more durable sustainability communication platform.",
-  },
-};
-const pageMeta: Record<string, { title: string; description: string }> = {
-  "/": {
-    title: "RevifyEarth — ESG Branding & Sustainability Communication",
-    description: "RevifyEarth turns complex ESG information into technically robust, visually compelling and strategically aligned communication.",
-  },
-  "/about": {
-    title: "About RevifyEarth — ESG Communication Partner",
-    description: "Meet RevifyEarth, an ESG branding and sustainability communication partner connecting technical understanding with strategic storytelling.",
-  },
-  "/services": {
-    title: "ESG Communication Services — RevifyEarth",
-    description: "Explore RevifyEarth services across content review, sustainability report design, print, video, web and integrated ESG communication.",
-  },
-  "/expertise": {
-    title: "ESG Expertise — RevifyEarth",
-    description: "Technical ESG understanding, sustainability reporting expertise and premium creative communication for organisations with important work to share.",
-  },
-  "/sustainability-branding": {
-    title: "Sustainability Branding & Communication — RevifyEarth",
-    description: "Build one coherent sustainability identity across report, print, board presentation, video and web with RevifyEarth.",
-  },
-  "/industries": {
-    title: "Industries We Serve — RevifyEarth",
-    description: "RevifyEarth brings context-led ESG branding and sustainability communication to organisations across sectors and operating environments.",
-  },
-  "/process": {
-    title: "Our ESG Communication Process — RevifyEarth",
-    description: "See how RevifyEarth moves from first evidence to final frame through a collaborative, practical and evidence-led process.",
-  },
-  "/team": {
-    title: "The RevifyEarth Team — ESG & Sustainability Experts",
-    description: "Meet the cross-disciplinary RevifyEarth team bringing ESG expertise, strategic storytelling and creative design together.",
-  },
-  "/projects": {
-    title: "Projects & Directions — RevifyEarth",
-    description: "Explore the RevifyEarth project lens: communication that holds together from evidence to executive room to public conversation.",
-  },
-  "/contact": {
-    title: "Contact RevifyEarth — Start a Conversation",
-    description: "Talk to RevifyEarth about your sustainability report, ESG communication system, video report or next strategic direction.",
-  },
-};
+/**
+ * Home ships in the initial chunk because it is the landing route; every other page
+ * is split out and fetched on navigation. Previously the whole site was one bundle.
+ */
+const named = <T extends string>(loader: () => Promise<Record<T, React.ComponentType<never>>>, key: T) =>
+  lazy(() => loader().then((module) => ({ default: module[key] })));
 
-function Logo({ light = false }: { light?: boolean }) {
-  return <Link href="/" className="flex items-center gap-3" data-testid="link-logo"><img src={asset("revify-mark-white.png")} alt="RevifyEarth mark" className={`h-9 w-9 object-contain ${light ? "" : "brightness-0 saturate-100 invert-[.85]"}`} /><span className={`text-[14px] font-extrabold tracking-[.16em] ${light ? "text-[#f2f0e8]" : "text-[#142b32]"}`}>REVIFY<span className="font-medium opacity-60">EARTH</span></span></Link>;
+const About = named(() => import('@/pages/About'), 'About');
+const Services = named(() => import('@/pages/Services'), 'Services');
+const ServiceDetail = lazy(() =>
+  import('@/pages/ServiceDetail').then((module) => ({ default: module.ServiceDetail })),
+);
+const Expertise = named(() => import('@/pages/Expertise'), 'Expertise');
+const Branding = named(() => import('@/pages/Branding'), 'Branding');
+const Industries = named(() => import('@/pages/Industries'), 'Industries');
+const Process = named(() => import('@/pages/Process'), 'Process');
+const Team = named(() => import('@/pages/Team'), 'Team');
+const Projects = named(() => import('@/pages/Projects'), 'Projects');
+const Resources = named(() => import('@/pages/Resources'), 'Resources');
+const Contact = named(() => import('@/pages/Contact'), 'Contact');
+const NotFound = named(() => import('@/pages/NotFound'), 'NotFound');
+
+function RouteLoading() {
+  return (
+    <div className="flex min-h-[60vh] items-center justify-center bg-[#f2f0e8]" role="status" aria-live="polite">
+      <span className="sr-only">Loading page</span>
+      <span className="route-loader" aria-hidden="true" />
+    </div>
+  );
 }
-function SectionLabel({ children, light = false }: { number?: string; children: ReactNode; light?: boolean }) {
-  return <div className={`mb-7 flex items-center gap-4 ${light ? "text-[#a8c95a]" : "text-[#24626b]"}`}><span className="h-px w-10 bg-current/40" /><span className="eyebrow" style={{color:"inherit"}}>{children}</span></div>;
+
+function Routes() {
+  return (
+    <Switch>
+      <Route path="/" component={Home} />
+      <Route path="/about" component={About} />
+      <Route path="/services" component={Services} />
+      <Route path="/services/:slug">{(params) => <ServiceDetail slug={params.slug} />}</Route>
+      <Route path="/expertise" component={Expertise} />
+      <Route path="/sustainability-branding" component={Branding} />
+      <Route path="/industries" component={Industries} />
+      <Route path="/process" component={Process} />
+      <Route path="/team" component={Team} />
+      <Route path="/projects" component={Projects} />
+      <Route path="/resources" component={Resources} />
+      <Route path="/contact" component={Contact} />
+      <Route component={NotFound} />
+    </Switch>
+  );
 }
-function ArrowLink({ children, href = "/contact", light = false }: { children: ReactNode; href?: string; light?: boolean }) {
-  return <Link href={href} className={`line-draw group inline-flex items-center gap-3 pb-2 text-[10px] font-bold uppercase tracking-[.17em] ${light ? "text-[#f2f0e8]" : "text-[#142b32]"}`} data-testid={`link-${String(children).toLowerCase().replaceAll(" ","-")}`}>{children}<ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" /></Link>;
+
+/**
+ * Persistent app shell.
+ *
+ * Header, footer and the assistant live above the router, so navigating no longer
+ * unmounts them — the assistant used to lose its conversation on every route change
+ * because it was rendered inside each page.
+ */
+function Shell() {
+  return (
+    <div className="noise min-h-dvh bg-[#f2f0e8] text-[#142b32]">
+      <SkipLink />
+      <PageMeta />
+      <ScrollProgress />
+      <ScrollToTop />
+      <Header />
+      <main id="main" tabIndex={-1}>
+        <Suspense fallback={<RouteLoading />}>
+          <Routes />
+        </Suspense>
+      </main>
+      <Footer />
+      <Assistant />
+    </div>
+  );
 }
-function Header() {
-  const [open,setOpen] = useState(false);
-  const [location] = useLocation();
-  useEffect(() => setOpen(false), [location]);
-  return <header className="sticky top-0 z-40 border-b border-white/10 bg-[#142b32]/95 text-[#f2f0e8] backdrop-blur-xl">
-    <div className="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-4 md:px-10"><Logo light /><nav className="hidden items-center gap-6 lg:flex">{nav.map(([label,href])=><Link key={href} href={href} className="text-[10px] font-bold uppercase tracking-[.13em] text-white/70 transition-colors hover:text-[#a8c95a]" data-testid={`link-nav-${label.toLowerCase().replaceAll(" ","-")}`}>{label}</Link>)}</nav><Link href="/contact" className="hidden items-center gap-2 rounded-full bg-[#a8c95a] px-5 py-3 text-[10px] font-extrabold uppercase tracking-[.14em] text-[#142b32] transition-transform hover:-translate-y-0.5 md:flex">Start a conversation <ArrowUpRight className="h-3.5 w-3.5" /></Link><button type="button" aria-label={open?"Close menu":"Open menu"} onClick={()=>setOpen(!open)} className="rounded-full border border-white/20 p-2 lg:hidden" data-testid="button-mobile-menu">{open?<X className="h-5 w-5"/>:<Menu className="h-5 w-5"/>}</button></div>
-    {open&&<nav className="border-t border-white/10 bg-[#142b32] px-5 pb-6 pt-2 lg:hidden">{nav.map(([label,href])=><Link key={href} href={href} className="block border-b border-white/10 py-4 text-xs font-bold uppercase tracking-[.14em]">{label}</Link>)}<Link href="/contact" className="mt-5 inline-flex rounded-full bg-[#a8c95a] px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-[#142b32]">Start a conversation</Link></nav>}
-  </header>;
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+          <Shell />
+        </WouterRouter>
+        <Toaster />
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
 }
-function Footer() {
-  return <footer className="bg-[#10252b] px-5 py-10 text-[#eef1e9] md:px-10"><div className="mx-auto flex max-w-[1440px] flex-col gap-9 md:flex-row md:items-end md:justify-between"><div><Logo light/><p className="mt-5 max-w-xs text-xs leading-6 text-white/50">Revify Private Limited — ESG Branding & Sustainability Communication.</p></div><div className="flex flex-col gap-4 md:items-end"><div className="flex gap-5"><a href="https://www.linkedin.com" aria-label="LinkedIn" className="text-white/60 hover:text-[#a8c95a]"><Linkedin className="h-4 w-4"/></a><a href="https://www.instagram.com" aria-label="Instagram" className="text-white/60 hover:text-[#a8c95a]"><Instagram className="h-4 w-4"/></a></div><p className="font-mono-custom text-[10px] text-white/45">© 2026 Revify Private Limited, All rights reserved.</p></div></div></footer>;
-}
-function Progress() {
-  const [width,setWidth] = useState(0);
-  useEffect(()=>{ const update=()=>setWidth((window.scrollY/(document.documentElement.scrollHeight-window.innerHeight))*100); update(); window.addEventListener("scroll",update,{passive:true}); return()=>window.removeEventListener("scroll",update); },[]);
-  return <div className="progress-bar" style={{width:`${Math.min(100,Math.max(0,width))}%`}} aria-hidden="true"/>;
-}
-function PageMeta() {
-  const [location] = useLocation();
-  useEffect(() => {
-    const meta = pageMeta[location] ?? pageMeta["/"];
-    document.title = meta.title;
-    const setMeta = (selector: string, attribute: "name" | "property", value: string) => {
-      let element = document.head.querySelector<HTMLMetaElement>(selector);
-      if (!element) {
-        element = document.createElement("meta");
-        element.setAttribute(attribute, selector.match(/"([^"]+)"/)?.[1] ?? "");
-        document.head.appendChild(element);
-      }
-      element.setAttribute("content", value);
-    };
-    setMeta('meta[name="description"]', "name", meta.description);
-    setMeta('meta[property="og:title"]', "property", meta.title);
-    setMeta('meta[property="og:description"]', "property", meta.description);
-    setMeta('meta[name="twitter:title"]', "name", meta.title);
-    setMeta('meta[name="twitter:description"]', "name", meta.description);
-    let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-    if (!canonical) {
-      canonical = document.createElement("link");
-      canonical.rel = "canonical";
-      document.head.appendChild(canonical);
-    }
-    canonical.href = `${window.location.origin}${location === "/" ? "" : location}`;
-  }, [location]);
-  return null;
-}
-function Atmosphere({ dark=false }: { dark?: boolean }) { return <div className="atmosphere" aria-hidden="true"><div className="orb orb-a"/><div className="orb orb-b"/>{dark&&<div className="absolute inset-0 bg-[#142b32]/25"/>}</div>; }
-function PageHero({ eyebrow, title, intro, image, dark=false }: {number?: string; eyebrow:string; title:ReactNode; intro:string; image?:string; dark?:boolean}) {
-  return <section className={`relative isolate overflow-hidden ${dark?"bg-[#142b32] text-[#f2f0e8]":"bg-[#e5ebdf] text-[#142b32]"}`}><Atmosphere dark={dark}/>{image&&<img src={asset(image)} alt="" className="absolute inset-0 -z-20 h-full w-full object-cover opacity-25 mix-blend-multiply"/>}<div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#142b32]/70 via-transparent to-transparent opacity-50"/><div className="relative mx-auto grid min-h-[570px] max-w-[1440px] items-end gap-10 px-5 pb-16 pt-24 md:grid-cols-[1.15fr_.85fr] md:px-10 md:pb-24"><div className="max-w-4xl"><p className={`eyebrow mb-7 ${dark?"text-[#a8c95a]":""}`}>{eyebrow}</p><h1 className="font-display text-[clamp(3.7rem,8vw,8rem)] leading-[.88] tracking-[-.055em] reveal">{title}</h1></div><p className={`max-w-sm text-sm leading-7 reveal reveal-delay ${dark?"text-white/70":"text-[#3d5a5f]"}`}>{intro}</p></div></section>;
-}
-function QuoteBand({ children }: {children:ReactNode}) { return <section className="bg-[#24626b] px-5 py-20 text-[#f2f0e8] md:px-10 md:py-28"><div className="mx-auto max-w-[1040px] text-center"><p className="font-display text-4xl leading-[1.05] tracking-[-.035em] md:text-6xl">“{children}”</p></div></section>; }
-function Home() {
-  const [showVideo,setShowVideo]=useState(false);
-  return <PageFrame><main><section className="relative isolate flex min-h-[760px] items-end overflow-hidden bg-[#142b32] text-[#f2f0e8] md:min-h-[850px]"><img src={asset("hero-birds.jpg")} alt="Seabirds above open water" className="absolute inset-0 -z-20 h-full w-full object-cover opacity-55"/><div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#142b32] via-[#142b32]/40 to-transparent"/><Atmosphere dark/><div className="mx-auto w-full max-w-[1440px] px-5 pb-16 md:px-10 md:pb-24"><p className="eyebrow mb-7 text-[#d3dfb2] reveal">Sustainability communication / Revify Private Limited</p><h1 className="font-display max-w-5xl text-[clamp(4rem,9vw,9rem)] leading-[.87] tracking-[-.06em] reveal reveal-delay">Make the work<br/><em>impossible</em><br/>to overlook.</h1><div className="mt-10 flex flex-col justify-between gap-8 border-t border-white/25 pt-5 md:flex-row md:items-end reveal reveal-delay-2"><p className="max-w-md text-sm leading-7 text-white/80">We turn complex ESG information into one coherent story — technically robust, visually compelling and strategically aligned.</p><ArrowLink href="/about" light>Explore RevifyEarth</ArrowLink></div></div></section>
-    <section className="mx-auto grid max-w-[1440px] gap-12 px-5 py-24 md:grid-cols-[.8fr_1.2fr] md:px-10 md:py-36"><div><SectionLabel number="01">The proposition</SectionLabel><p className="font-display text-4xl leading-[1.05] tracking-[-.035em] text-[#24626b] md:text-6xl">One story.<br/><em>Many ways</em><br/>to meet it.</p></div><div className="max-w-2xl md:pt-10"><p className="text-2xl font-medium leading-[1.35] tracking-[-.025em] md:text-4xl">From writing Sagility’s first Sustainability Report to exploring possibilities for you to be a holistic ESG branding & communication partner.</p><p className="mt-8 max-w-xl text-sm leading-7 text-[#3d5a5f]">Revify proposes an Integrated Sustainability Branding & Communication Program that extends beyond report preparation. We bring together sustainability consulting, strategic communication and creative excellence under one integrated engagement model.</p><div className="mt-10"><ArrowLink href="/services">See the full ecosystem</ArrowLink></div></div></section>
-    <section className="bg-[#dce5d0] px-5 py-24 md:px-10 md:py-32"><div className="mx-auto max-w-[1440px]"><SectionLabel number="02">What we do</SectionLabel><div className="grid gap-10 md:grid-cols-[.8fr_1.2fr]"><h2 className="font-display max-w-md text-5xl leading-[.98] md:text-7xl">Build the<br/><em>communication</em><br/>ecosystem.</h2><div><p className="max-w-lg text-sm leading-7 text-[#3d5a5f]">Sustainability reporting is a strategic communication exercise — one that builds stakeholder confidence and strengthens corporate reputation.</p><ArrowLink href="/services">Explore services</ArrowLink></div></div><div className="mt-16 grid border-t border-[#8ba59a] md:grid-cols-2 lg:grid-cols-3">{services.slice(0,6).map(([num,title,body],i)=><article key={num} className={`group border-b border-[#8ba59a] py-7 md:px-6 ${i%2===0?"md:border-r":""} lg:min-h-[245px]`}><div className="flex justify-between"><span className="font-mono-custom text-xs text-[#24626b]">{num}</span><ArrowDownRight className="h-5 w-5 text-[#24626b] transition-transform group-hover:translate-x-1 group-hover:translate-y-1"/></div><h3 className="mt-12 max-w-xs text-lg font-bold">{title}</h3><p className="mt-4 max-w-sm text-xs leading-6 text-[#3d5a5f]">{body}</p></article>)}</div></div></section>
-    <QuoteBand>Clarity is a form of leadership.</QuoteBand>
-    <section className="relative overflow-hidden bg-[#142b32] px-5 py-24 text-[#f2f0e8] md:px-10 md:py-32"><img src={asset("mountain-sunset.jpg")} alt="Mountain landscape at sunset" className="absolute inset-0 h-full w-full object-cover opacity-20"/><div className="relative mx-auto grid max-w-[1440px] gap-12 md:grid-cols-[1fr_.8fr] md:items-end"><div><SectionLabel number="03" light>Go beyond the report</SectionLabel><h2 className="font-display max-w-3xl text-5xl leading-[.95] md:text-8xl">Give the work<br/><em>a wider life.</em></h2></div><div><p className="max-w-sm text-sm leading-7 text-white/70">A 5–7 minute visual narrative can give the reporting year a different kind of reach — through concept, script, storyboard, motion graphics and animated data visualisations.</p><button type="button" onClick={()=>setShowVideo(true)} className="mt-8 inline-flex items-center gap-3 rounded-full bg-[#a8c95a] px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-[#142b32]" data-testid="button-video-preview"><Play className="h-3.5 w-3.5 fill-current"/> Preview the approach</button></div></div></section>
-    <CTA/></main>{showVideo&&<VideoModal onClose={()=>setShowVideo(false)}/>}</PageFrame>;
-}
-function About() { return <PageFrame><PageHero number="01" eyebrow="The proposition" title={<>The work behind<br/><em>the story.</em></>} intro="Revify Private Limited is an ESG branding and sustainability communication partner. We make complex sustainability information useful, credible and memorable." image="forest-mist.jpg"/><section className="mx-auto grid max-w-[1440px] gap-12 px-5 py-24 md:grid-cols-[.8fr_1.2fr] md:px-10 md:py-36"><div><SectionLabel number="02">A wider brief</SectionLabel><h2 className="font-display text-5xl leading-[.95] text-[#24626b] md:text-7xl">Not just<br/><em>reporting.</em></h2></div><div className="max-w-2xl"><p className="text-2xl font-medium leading-[1.3] md:text-4xl">We bring technical understanding, strategic storytelling and premium creative design together under one integrated engagement.</p><p className="mt-8 text-sm leading-7 text-[#3d5a5f]">Our work helps organisations turn reporting into a communication system: one that can live in a report, a boardroom, a film, a webpage and the conversations that follow.</p><div className="mt-10"><ArrowLink href="/sustainability-branding">Discover the approach</ArrowLink></div></div></section><QuoteBand>One coherent story, wherever it lands.</QuoteBand><CTA/></PageFrame>; }
-function Services() { return <PageFrame><PageHero number="02" eyebrow="What we do" title={<>Build the<br/><em>ecosystem.</em></>} intro="From content review to web, print and video, each service is designed to carry the same strategic intent." image="volcano.jpg"/><section className="bg-[#dce5d0] px-5 py-20 md:px-10 md:py-28"><div className="mx-auto max-w-[1440px]"><div className="grid gap-0 border-t border-[#8ba59a] md:grid-cols-2">{services.map(([num,title,body])=><article key={num} className="group border-b border-[#8ba59a] py-9 md:px-8 md:first:pl-0"><div className="flex justify-between"><span className="font-mono-custom text-xs text-[#24626b]">{num}</span><ArrowDownRight className="h-5 w-5 text-[#24626b] transition-transform group-hover:translate-x-1 group-hover:translate-y-1"/></div><h2 className="mt-12 max-w-md font-display text-3xl leading-tight md:text-4xl">{title}</h2><p className="mt-5 max-w-md text-sm leading-7 text-[#3d5a5f]">{body}</p></article>)}</div></div></section><CTA/></PageFrame>; }
-function Expertise() { return <PageFrame><PageHero number="03" eyebrow="ESG expertise" title={<>The rigour<br/><em>behind the</em><br/>beauty.</>} intro="Technical confidence makes creative communication land. Revify connects the two." dark image="hero-birds.jpg"/><section className="bg-[#24626b] px-5 py-20 text-[#f2f0e8] md:px-10 md:py-28"><div className="mx-auto grid max-w-[1200px] gap-0 sm:grid-cols-2">{expertise.map(([title,body],i)=><article key={title} className="border-t border-white/25 p-6 first:pl-0 sm:nth-[odd]:pl-0"><span className="font-mono-custom text-[10px] text-[#a8c95a]">0{i+1}</span><h2 className="mt-7 text-xl font-bold">{title}</h2><p className="mt-3 max-w-sm text-sm leading-7 text-white/65">{body}</p></article>)}</div></section><section className="mx-auto grid max-w-[1440px] gap-12 px-5 py-24 md:grid-cols-2 md:px-10 md:py-32"><img src={asset("forest-mist.jpg")} alt="Forest in mist" className="h-[420px] w-full object-cover"/><div className="flex flex-col justify-center"><SectionLabel number="04">The point of view</SectionLabel><h2 className="font-display text-5xl leading-[.96] text-[#24626b] md:text-7xl">Make the<br/><em>information</em><br/>land.</h2><p className="mt-8 max-w-md text-sm leading-7 text-[#3d5a5f]">The challenge is rarely a lack of information. It is making the information land — with the right context, confidence and creative signal.</p></div></section><CTA/></PageFrame>; }
-function Branding() { const [tab,setTab]=useState("Report"); const tabs=["Report","Print","Video","Web"]; return <PageFrame><PageHero number="04" eyebrow="Sustainability branding" title={<>One identity.<br/><em>Many formats.</em></>} intro="A sustainability report can become a platform for a year of communication — not a document that disappears after publication." image="mountain-sunset.jpg"/><section className="mx-auto max-w-[1440px] px-5 py-24 md:px-10 md:py-32"><SectionLabel number="05">The connected system</SectionLabel><div className="flex flex-wrap gap-2 border-b border-[#b8c9bd] pb-5">{tabs.map(t=><button key={t} type="button" onClick={()=>setTab(t)} className={`rounded-full border px-5 py-3 text-[10px] font-bold uppercase tracking-widest transition-colors ${tab===t?"border-[#142b32] bg-[#142b32] text-[#f2f0e8]":"border-[#b8c9bd] text-[#24626b]"}`}>{t}</button>)}</div><div className="grid gap-12 py-14 md:grid-cols-[.7fr_1.3fr]"><h2 className="font-display text-5xl leading-none text-[#24626b] md:text-7xl">{tab}<br/><em>with intent.</em></h2><div className="max-w-xl"><p className="text-2xl font-medium leading-[1.3]">Every format carries the same narrative architecture, visual language and strategic priorities.</p><p className="mt-7 text-sm leading-7 text-[#3d5a5f]">{tab==="Report"?"An editorial report that makes disclosure legible, authoritative and worth spending time with.":tab==="Print"?"Considered stock, proofing and production choices for a report that feels as responsible as its content.":tab==="Video"?"A 5–7 minute visual narrative with script, storyboard, motion graphics and animated KPIs.":"A responsive digital home for sustainability overview, thematic content, video and downloadable access."}</p></div></div></section><QuoteBand>The same story, wherever it lands.</QuoteBand><CTA/></PageFrame>; }
-function Industries() { return <PageFrame><PageHero number="05" eyebrow="Industries we serve" title={<>Context makes<br/><em>the difference.</em></>} intro="Different sectors carry different evidence, language and expectations. We start there." image="volcano.jpg"/><section className="mx-auto max-w-[1440px] px-5 py-24 md:px-10 md:py-32"><div className="grid gap-6 md:grid-cols-3">{industries.map(([title,body,img],i)=><article key={title} className="group border-t border-[#9db5ab] pt-5"><div className="relative mb-7 h-64 overflow-hidden bg-[#24626b]"><img src={asset(img)} alt="" className="h-full w-full object-cover opacity-80 transition-transform duration-700 group-hover:scale-105"/><span className="absolute bottom-4 left-4 font-mono-custom text-xs text-white">0{i+1}</span></div><h2 className="font-display text-3xl text-[#24626b]">{title}</h2><p className="mt-4 text-sm leading-7 text-[#3d5a5f]">{body}</p></article>)}</div></section><QuoteBand>Every organisation has a story. The work is finding its most useful shape.</QuoteBand><CTA/></PageFrame>; }
-const processSteps=["Project kick-off","Data collection templates","Literature review","Data collection support","Lifecycle inventory using collected data","Evaluation of environmental impacts","Consolidate / final report","Presentation of results"];
-function Process() { const [active,setActive]=useState(0); return <PageFrame><PageHero number="06" eyebrow="A considered process" title={<>From first<br/><em>evidence</em><br/>to final frame.</>} intro="A collaborative, practical process that keeps the work moving and the narrative honest." dark image="forest-mist.jpg"/><section className="mx-auto max-w-[1440px] px-5 py-24 md:px-10 md:py-32"><div className="grid gap-12 md:grid-cols-[.7fr_1.3fr]"><div><SectionLabel number="07">The sequence</SectionLabel><p className="max-w-sm text-sm leading-7 text-[#3d5a5f]">Data collection may vary and the timeline assumes up to 6 weeks for data collection. Each stage creates a clearer next move.</p></div><div><div className="border-t border-[#b8c9bd]">{processSteps.map((step,i)=><button type="button" key={step} onClick={()=>setActive(i)} className={`flex w-full items-center gap-4 border-b border-[#b8c9bd] py-5 text-left transition-colors ${active===i?"text-[#24626b]":"text-[#142b32]"}`}><span className="font-mono-custom text-[10px]">0{i+1}</span><span className="text-sm font-semibold">{step}</span><ChevronDown className={`ml-auto h-4 w-4 transition-transform ${active===i?"rotate-180":""}`}/></button>)}</div><div className="mt-8 border-l-2 border-[#a8c95a] pl-6"><p className="text-lg font-medium">{processSteps[active]} is where the next useful question surfaces.</p><p className="mt-3 text-sm leading-7 text-[#3d5a5f]">We keep the process collaborative, evidence-led and connected to the final communication outcome.</p></div></div></div></section><CTA/></PageFrame>; }
-function Team() { return <PageFrame><PageHero number="07" eyebrow="The people" title={<>A partner at<br/><em>every level</em><br/>of the story.</>} intro="A cross-disciplinary team for the work that needs both precision and perspective." image="hero-birds.jpg"/><section className="bg-[#e7dfd0] px-5 py-24 md:px-10 md:py-32"><div className="mx-auto max-w-[1440px]"><div className="grid gap-x-5 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">{team.map(([name,role,bio,image],i)=><article key={name} className="group border-t border-[#bbaF9d] pt-5"><div className="relative mb-5 flex h-[290px] items-end justify-center overflow-hidden bg-[#c8d0ca]"><div className="absolute inset-0 bg-gradient-to-t from-[#24626b]/25 to-transparent"/><img src={asset(image)} alt={name} className="relative h-full w-full object-contain object-bottom transition-transform duration-500 group-hover:scale-[1.04]"/></div><h2 className="text-lg font-extrabold">{name}</h2><p className="mt-1 font-mono-custom text-[10px] uppercase tracking-wider text-[#24626b]">{role}</p>{bio&&<p className="mt-3 text-xs leading-6 text-[#3d5a5f]">{bio}</p>}</article>)}</div></div></section><CTA/></PageFrame>; }
-function Projects() { const [filter,setFilter]=useState("All"); const items=[["Sustainability report","Editorial systems and visualisation","Report"],["Integrated communication","Report, video and digital touchpoints","Integrated"],["Board presentation","Clear, executive-level storytelling","Strategy"]]; const shown=filter==="All"?items:items.filter(x=>x[2]===filter||filter==="Communication"&&x[2]==="Integrated"); return <PageFrame><PageHero number="08" eyebrow="Selected directions" title={<>Work that<br/><em>travels.</em></>} intro="Our project lens is simple: create communication that holds together from evidence to executive room to public conversation." image="mountain-sunset.jpg"/><section className="mx-auto max-w-[1440px] px-5 py-24 md:px-10 md:py-32"><div className="flex flex-wrap items-end justify-between gap-8"><SectionLabel number="09">Projects / approach</SectionLabel><div className="flex gap-2">{["All","Report","Integrated","Strategy"].map(x=><button key={x} type="button" onClick={()=>setFilter(x)} className={`rounded-full border px-4 py-2 text-[10px] font-bold uppercase tracking-widest ${filter===x?"bg-[#142b32] text-[#f2f0e8]":"border-[#b8c9bd] text-[#24626b]"}`}>{x}</button>)}</div></div><div className="mt-10 grid gap-6 md:grid-cols-3">{shown.map(([title,body,kind],i)=><article key={title} className="border-t border-[#9db5ab] pt-5"><div className="mb-8 flex h-56 items-end justify-between overflow-hidden bg-[#24626b] p-5 text-[#f2f0e8]"><span className="font-mono-custom text-xs">0{i+1}</span><span className="font-display text-7xl italic opacity-40">{kind.slice(0,1)}</span></div><h2 className="font-display text-3xl text-[#24626b]">{title}</h2><p className="mt-3 text-sm leading-7 text-[#3d5a5f]">{body}</p></article>)}</div><p className="mt-12 max-w-2xl border-l-2 border-[#a8c95a] pl-5 text-sm leading-7 text-[#3d5a5f]">Client-specific commercial scope and fees are intentionally not presented here. Projects are scoped to the brief.</p></section><CTA/></PageFrame>; }
-function Contact() { const [sent,setSent]=useState(false); const submit=(e:FormEvent<HTMLFormElement>)=>{e.preventDefault();setSent(true)}; return <PageFrame><PageHero number="09" eyebrow="Start here" title={<>Your story<br/><em>deserves</em><br/>a system.</>} intro="Engagements are scoped to the brief. Tell us what you are working on and where the story needs to go." dark image="hero-birds.jpg"/><section className="bg-[#a8c95a] px-5 py-20 text-[#142b32] md:px-10 md:py-28"><div className="mx-auto grid max-w-[1200px] gap-14 md:grid-cols-[.8fr_1.2fr]"><div><SectionLabel number="10">The conversation</SectionLabel><h2 className="font-display text-5xl leading-[.95] md:text-7xl">Start with<br/><em>the brief.</em></h2><div className="mt-12 border-t border-[#142b32]/30 pt-5"><p className="eyebrow text-[#142b32]">General enquiries</p><a href="mailto:info@revifyearth.com" className="mt-3 block text-xl font-bold hover:underline">info@revifyearth.com</a><a href="https://www.revifyearth.com" target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-2 text-sm hover:underline">www.revifyearth.com <ExternalLink className="h-3.5 w-3.5"/></a><p className="mt-8 text-sm font-semibold">Anu Ananya <span className="font-normal opacity-70">/ Sagility Partnership Manager / CFO</span></p><a href="tel:7978869701" className="text-sm hover:underline">7978869701</a><p className="mt-4 text-sm font-semibold">Pallavi Priya <span className="font-normal opacity-70">/ Project Manager / CEO</span></p><a href="tel:9608159460" className="text-sm hover:underline">9608159460</a></div></div>{sent?<div className="flex flex-col justify-center border-t border-[#142b32]/30 pt-6"><Check className="h-9 w-9"/><h2 className="mt-6 font-display text-5xl">Message<br/><em>received.</em></h2><p className="mt-5 max-w-sm text-sm leading-7">Thank you. This demonstration form is ready to connect to your preferred enquiry workflow.</p><button type="button" onClick={()=>setSent(false)} className="mt-8 self-start border-b border-current pb-2 text-[10px] font-bold uppercase tracking-widest">Send another message</button></div>:<form onSubmit={submit} className="space-y-5 border-t border-[#142b32]/30 pt-6"><label className="block"><span className="eyebrow text-[#142b32]">Name</span><input required name="name" className="mt-3 w-full border-b border-[#142b32]/40 bg-transparent px-0 py-3 outline-none placeholder:text-[#142b32]/45" placeholder="Your name"/></label><label className="block"><span className="eyebrow text-[#142b32]">Work email</span><input required type="email" name="email" className="mt-3 w-full border-b border-[#142b32]/40 bg-transparent px-0 py-3 outline-none placeholder:text-[#142b32]/45" placeholder="you@organisation.com"/></label><label className="block"><span className="eyebrow text-[#142b32]">What are you working on?</span><textarea required name="message" rows={4} className="mt-3 w-full resize-none border-b border-[#142b32]/40 bg-transparent px-0 py-3 outline-none placeholder:text-[#142b32]/45" placeholder="A report, a wider communication system, a new direction..."/></label><button type="submit" className="mt-4 inline-flex items-center gap-3 rounded-full bg-[#142b32] px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#f2f0e8]">Send enquiry <Send className="h-3.5 w-3.5"/></button></form>}</div></section><section className="mx-auto max-w-[1440px] px-5 py-24 md:px-10"><p className="font-display max-w-3xl text-4xl leading-tight text-[#24626b] md:text-6xl">The best work starts with a useful question.</p></section></PageFrame>; }
-function CTA() { return <section className="bg-[#a8c95a] px-5 py-20 text-[#142b32] md:px-10 md:py-28"><div className="mx-auto flex max-w-[1440px] flex-col justify-between gap-8 md:flex-row md:items-end"><h2 className="font-display max-w-3xl text-5xl leading-[.94] md:text-7xl">Your story<br/><em>deserves</em><br/>a system.</h2><ArrowLink href="/contact">Start a conversation</ArrowLink></div></section>; }
-function VideoModal({onClose}:{onClose:()=>void}) { return <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#10252b]/85 p-5 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Video report approach" onClick={onClose}><div className="relative w-full max-w-2xl bg-[#f2f0e8] p-7 text-[#142b32] md:p-12" onClick={e=>e.stopPropagation()}><button type="button" className="absolute right-5 top-5" onClick={onClose} aria-label="Close video preview"><X className="h-5 w-5"/></button><p className="eyebrow">Video report / approach</p><h2 className="mt-6 font-display text-5xl leading-none">Not page-by-page.<br/><em>A visual narrative.</em></h2><p className="mt-6 max-w-lg text-sm leading-7 text-[#3d5a5f]">Narrative and creative concept, script, storyboard, motion graphics, animated KPIs and data visualisations, report graphics, provided footage and photos, licensed stock, on-screen text, licensed background music, voice-over where included, editing, transitions and final render.</p><div className="mt-8 flex flex-wrap gap-2">{["Full HD output","2 × 30-second Instagram clips","Report identity"].map(x=><span key={x} className="border border-[#b8c9bd] px-3 py-2 font-mono-custom text-[10px]">{x}</span>)}</div></div></div>; }
-function Assistant() {
-  const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<{ prompt: string; response: string }[]>([]);
-  const [typing, setTyping] = useState<string | null>(null);
-  const prompts = ["What does Revify do?", "How does the process work?", "What can a video report include?"];
-  const responses: Record<string, string> = {
-    "What does Revify do?": "Revify connects technical ESG understanding with strategic storytelling and creative communication.",
-    "How does the process work?": "The work moves from evidence and review through report, presentation, video and web — with each stage connected to the next.",
-    "What can a video report include?": "A 5–7 minute visual narrative can include concept, script, storyboard, motion graphics, animated KPIs, voice-over where included and Full HD output.",
-  };
-  const answer = (prompt: string) => {
-    if (typing) return;
-    setTyping(prompt);
-    window.setTimeout(() => {
-      setMessages((current) => [...current, { prompt, response: responses[prompt] }]);
-      setTyping(null);
-    }, 650);
-  };
-  return <div className="fixed bottom-5 right-5 z-40 md:bottom-7 md:right-7">{open&&<div className="mb-3 w-[min(360px,calc(100vw-2.5rem))] overflow-hidden border border-white/20 bg-[#142b32]/95 text-[#f2f0e9] shadow-2xl backdrop-blur-xl"><div className="flex items-start justify-between border-b border-white/15 p-5"><div><p className="eyebrow text-[#a8c95a]">Revify assistant</p><p className="mt-2 text-sm font-bold">A guided demonstration</p></div><button type="button" onClick={()=>setOpen(false)} aria-label="Close assistant"><X className="h-4 w-4"/></button></div><div className="space-y-3 p-5"><p className="text-xs leading-6 text-white/65">This is a demonstration of future AI capabilities, not a production chatbot.</p>{messages.map((message,i)=><div key={`${message.prompt}-${i}`} className="border-l-2 border-[#a8c95a] pl-3 text-xs leading-5"><span className="text-white/50">You asked: </span>{message.prompt}<p className="mt-2 text-white/70">{message.response}</p></div>)}{typing&&<div className="flex items-center gap-2 border-l-2 border-[#a8c95a] py-1 pl-3 text-xs text-white/60" aria-live="polite"><span>Revify is thinking</span><span className="typing-dots" aria-hidden="true">•••</span></div>}<div className="space-y-2 pt-2">{prompts.map(p=><button type="button" key={p} disabled={Boolean(typing)} onClick={()=>answer(p)} className="flex w-full items-center justify-between border border-white/15 px-3 py-3 text-left text-[11px] transition-colors hover:border-[#a8c95a] disabled:cursor-wait disabled:opacity-45">{p}<ArrowUpRight className="h-3.5 w-3.5 text-[#a8c95a]"/></button>)}</div></div></div>}<button type="button" onClick={()=>setOpen(!open)} aria-label={open?"Close AI assistant demo":"Open AI assistant demo"} className="flex items-center gap-3 rounded-full bg-[#a8c95a] px-4 py-3 text-[10px] font-extrabold uppercase tracking-widest text-[#142b32] shadow-lg transition-transform hover:-translate-y-1"><MessageCircle className="h-4 w-4"/>{open?"Close":"AI demo"}</button></div>;
-}
-function PageFrame({children}:{children:ReactNode}) { return <div className="noise min-h-[100dvh] bg-[#f2f0e8] text-[#142b32]"><PageMeta/><Progress/><Header/><div className="route-shell">{children}</div><Footer/><Assistant/></div>; }
-function Router() { return <Switch><Route path="/" component={Home}/><Route path="/about" component={About}/><Route path="/services" component={Services}/><Route path="/expertise" component={Expertise}/><Route path="/sustainability-branding" component={Branding}/><Route path="/industries" component={Industries}/><Route path="/process" component={Process}/><Route path="/team" component={Team}/><Route path="/projects" component={Projects}/><Route path="/contact" component={Contact}/><Route component={Home}/></Switch>; }
-function App() { return <QueryClientProvider client={queryClient}><TooltipProvider><WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/,"")}><Router/></WouterRouter><Toaster/></TooltipProvider></QueryClientProvider>; }
+
 export default App;
