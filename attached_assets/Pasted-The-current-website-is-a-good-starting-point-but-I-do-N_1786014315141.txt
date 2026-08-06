@@ -1,0 +1,111 @@
+The current website is a good starting point, but I do NOT want a one-page scrolling website.
+
+I want a complete, premium, enterprise-grade corporate website where every major section has its own dedicated page with rich, meaningful content and a professional user experience.
+
+Study every uploaded document carefully and use it as the single source of truth for all content, services, team information, ESG expertise, methodology, and company details. Use the official RevifyEarth logo, official team photos, and all available company assets from the uploaded files. Do not replace official assets with AI-generated alternatives.
+
+I want the website to feel alive, modern, and world-class.
+
+Improve the entire website with:
+
+• Premium enterprise UI/UX
+• Rich page layouts with meaningful content
+• Smooth page transitions
+• Elegant micro-interactions
+• Professional typography
+• Beautiful responsive layouts
+• Premium iconography
+• Modern illustrations where appropriate
+• Consistent spacing and visual hierarchy
+• Professional card designs
+• High-quality hover effects
+• Smooth loading animations
+• Beautiful section transitions
+• Sticky navigation
+• Scroll progress indicator
+• Interactive timeline
+• Animated statistics
+• Scroll-triggered content reveals
+• Elegant button interactions
+• Professional contact experience
+
+The background should never feel static.
+
+Create a premium ESG-inspired visual experience using:
+
+• Animated gradient backgrounds
+• Soft ambient environmental lighting
+• Forest-inspired green tones
+• Ocean blue accents
+• Organic abstract shapes
+• Smooth floating particles
+• Subtle background motion
+• Glass effects where appropriate
+• Layered depth
+• Premium visual atmosphere
+
+Every page should have its own unique identity while maintaining a consistent design system.
+
+Instead of placing everything on the homepage, create dedicated pages with comprehensive content for:
+
+• Home
+• About RevifyEarth
+• Services
+• ESG Expertise
+• Sustainability Branding & Communication
+• Industries We Serve
+• Our Process
+• Team
+• Case Studies / Projects (if supported by the uploaded content)
+• Contact
+
+Each page should include rich storytelling, visuals, animations, icons, illustrations, and interactive elements where appropriate.
+
+The Contact page should be much more than a simple contact form.
+
+Include:
+
+• Professional contact section
+• Interactive contact cards
+• Office information
+• Email
+• Phone
+• Contact form
+• Interactive map (if location is available)
+• Call-to-action sections
+• Beautiful transition effects
+
+Also add a modern AI Assistant demo section.
+
+This AI Assistant is only a demonstration of RevifyEarth's future AI capabilities.
+
+It should include:
+
+• Floating AI chat widget
+• Modern glassmorphism design
+• Smooth open/close animations
+• Typing animation
+• Suggested questions
+• Sample ESG-related responses
+• Premium AI interface
+• Mobile responsive design
+
+The AI Assistant should clearly indicate that it is a demo experience and not a production chatbot.
+
+Throughout the website, focus on creating an unforgettable premium experience.
+
+Every section should feel professionally designed.
+
+Every interaction should feel smooth.
+
+Every animation should have purpose.
+
+Every page should tell a story.
+
+The final website should look like it was designed and developed by a world-class product design agency for a premium ESG and Sustainability consulting company.
+
+Continue improving the website until it is production-ready.
+
+Do not stop after making minor changes.
+
+Keep refining the experience until every page, every animation, every interaction, and every visual detail reaches enterprise quality.
