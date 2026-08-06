@@ -14,3 +14,9 @@ The current public experience is intentionally multi-page rather than a single s
 **Why:** The latest creative direction prioritizes a richer enterprise website with dedicated storytelling paths and a non-production AI capability demo.
 
 **How to apply:** Preserve the shared navigation and visual system when adding future pages; do not imply that the assistant is connected to a live AI service unless an integration is explicitly added.
+
+The user prefers RevifyEarth sections to use editorial labels without visible numeric prefixes or card numbering.
+
+**Why:** Numeric markers made the premium editorial layout feel overly systemised and were explicitly requested to be removed.
+
+**How to apply:** Keep section labels, service cards, timelines, industry cards, and project cards unnumbered in future edits.

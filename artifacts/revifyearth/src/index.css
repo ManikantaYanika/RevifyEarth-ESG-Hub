@@ -44,4 +44,9 @@ body { overflow-x: hidden; }
 .progress-bar { position:fixed; left:0; top:0; z-index:80; height:3px; background:#a8c95a; transform-origin:left; }
 .route-shell { animation:rise .5s ease both; }
 .line-draw { position:relative; } .line-draw::after { content:""; position:absolute; left:0; right:100%; bottom:-1px; height:1px; background:#a8c95a; transition:right .35s ease; } .line-draw:hover::after { right:0; }
+.group > div.flex > span.font-mono-custom,
+article.border-t > span.font-mono-custom,
+article.group > div.relative > span.font-mono-custom,
+button > span.font-mono-custom,
+article.border-t > div.mb-8 > span.font-mono-custom { display:none; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; } }
