@@ -8,7 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 const queryClient = new QueryClient();
 const asset = (name: string) => `/assets/revify/${name}`;
 
-const nav = [["About","/about"],["Services","/services"],["ESG Expertise","/expertise"],["Industries","/industries"],["Process","/process"],["Team","/team"]] as const;
+const nav = [["About","/about"],["Services","/services"],["ESG Expertise","/expertise"],["Sustainability Branding","/sustainability-branding"],["Industries","/industries"],["Process","/process"],["Team","/team"],["Projects","/projects"]] as const;
 const services = [
   ["01","Content Review & Gap Assessment","A chapter-by-chapter review to turn disclosure gaps, inconsistencies and fragmented narratives into a clear reporting foundation."],
   ["02","Sustainability Report Design","A distinctive editorial system with five creative theme directions, custom visualisations and iterative reviews."],
@@ -38,6 +38,43 @@ const industries = [
   ["Energy & resources","For organisations translating operational complexity into accountable progress.","mountain-sunset.jpg"],
   ["People-led enterprises","For organisations making the social and human dimensions of value visible.","forest-mist.jpg"],
 ];
+const serviceDetails: Record<string, { overview: string; deliverables: string[]; bestFor: string }> = {
+  "Content Review & Gap Assessment": {
+    overview: "We bring structure to the reporting foundation before design begins, identifying where evidence, narrative and disclosure need more clarity.",
+    deliverables: ["Chapter-by-chapter review", "Gap and inconsistency map", "Priority questions for data owners", "Clear reporting foundation"],
+    bestFor: "Teams preparing a sustainability report or strengthening an existing disclosure cycle.",
+  },
+  "Sustainability Report Design": {
+    overview: "We translate reporting content into an editorial system that makes complex information easier to understand, navigate and remember.",
+    deliverables: ["Five creative theme directions", "Editorial layout system", "Custom visualisations", "Iterative review rounds"],
+    bestFor: "Organisations that want their report to feel authoritative, distinctive and useful to stakeholders.",
+  },
+  "Sustainable Print Production": {
+    overview: "We carry the sustainability story into the physical report through considered material choices, proofing and production support.",
+    deliverables: ["FSC-certified and/or recycled paper options", "Print-ready artwork", "Proofing coordination", "Production guidance"],
+    bestFor: "Teams creating a premium printed report without losing sight of responsible production.",
+  },
+  "Board Presentation Support": {
+    overview: "We distil the reporting year into an executive-level presentation that keeps the important indicators and forward priorities in focus.",
+    deliverables: ["Executive narrative structure", "Reporting-year highlights", "Key indicator selection", "Strategic forward-looking priorities"],
+    bestFor: "Leadership teams that need a confident, concise way to take sustainability work into the boardroom.",
+  },
+  "Video Report": {
+    overview: "We give the reporting year a wider life through a concise visual narrative designed for attention, clarity and reach.",
+    deliverables: ["Narrative and creative concept", "Script and storyboard", "Motion graphics and animated KPIs", "Full HD output"],
+    bestFor: "Organisations looking to make sustainability information more accessible across internal and external audiences.",
+  },
+  "Sustainability Report Webpage Development": {
+    overview: "We create a responsive digital home for the report so people can move naturally between overview, thematic content, video and download access.",
+    deliverables: ["Sustainability overview", "Thematic content structure", "Video and downloadable access", "Responsive webpage experience"],
+    bestFor: "Teams that want their report to be discoverable, shareable and easy to explore on every device.",
+  },
+  "Integrated ESG Communication": {
+    overview: "We connect technical review, report, print, presentation, video and web into one coherent communication system.",
+    deliverables: ["Integrated engagement direction", "Shared narrative architecture", "Consistent visual language", "Connected stakeholder touchpoints"],
+    bestFor: "Organisations ready to move beyond a single document and build a more durable sustainability communication platform.",
+  },
+};
 const pageMeta: Record<string, { title: string; description: string }> = {
   "/": {
     title: "RevifyEarth — ESG Branding & Sustainability Communication",
