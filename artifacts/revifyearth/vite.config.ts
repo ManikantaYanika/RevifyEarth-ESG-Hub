@@ -27,6 +27,10 @@ if (!basePath) {
   );
 }
 
+// Where the api-server listens in development. Its own default is 5000; override
+// with API_PORT if it has been moved.
+const apiPort = Number(process.env.API_PORT ?? 5000);
+
 export default defineConfig({
   base: basePath,
   plugins: [
@@ -71,6 +75,23 @@ export default defineConfig({
     allowedHosts: true,
     fs: {
       strict: true,
+    },
+    // The assistant calls /api/assistant/chat on the api-server. Proxying keeps the
+    // browser on one origin in development, so the request is same-origin and needs
+    // no CORS allowlist entry — matching how it behaves in production.
+    proxy: {
+      '/api': {
+        target: `http://127.0.0.1:${apiPort}`,
+        changeOrigin: true,
+        // Server-Sent Events must not be buffered or the reply arrives all at once.
+        configure(proxy) {
+          proxy.on('proxyRes', (proxyRes) => {
+            if (proxyRes.headers['content-type']?.includes('text/event-stream')) {
+              delete proxyRes.headers['content-length'];
+            }
+          });
+        },
+      },
     },
   },
   preview: {

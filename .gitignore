@@ -37,6 +37,11 @@ yarn-error.log
 testem.log
 /typings
 
+# Secrets. Never commit a real environment file — `.env.example` is the template.
+.env
+.env.*
+!.env.example
+
 # System Files
 .DS_Store
 Thumbs.db

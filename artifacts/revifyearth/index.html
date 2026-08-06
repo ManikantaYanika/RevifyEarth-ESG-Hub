@@ -2,17 +2,36 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <!-- maximum-scale removed: pinning it to 1 blocks pinch-zoom, which fails WCAG 1.4.4 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RevifyEarth — ESG Branding & Sustainability Communication</title>
     <meta name="description" content="RevifyEarth turns complex ESG information into technically robust, visually compelling and strategically aligned communication." />
     <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#142b32" />
+
+    <meta property="og:site_name" content="RevifyEarth" />
     <meta property="og:title" content="RevifyEarth — ESG Branding & Sustainability Communication" />
     <meta property="og:description" content="One coherent sustainability story across report, print, board, video and web." />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.revifyearth.com/" />
+    <meta property="og:image" content="https://www.revifyearth.com/assets/revify/hero-birds-1600.webp" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="RevifyEarth — ESG Branding & Sustainability Communication" />
     <meta name="twitter:description" content="One coherent sustainability story across report, print, board, video and web." />
+    <meta name="twitter:image" content="https://www.revifyearth.com/assets/revify/hero-birds-1600.webp" />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Fonts were @imported from index.css, which serialises the request behind the
+         stylesheet. Linking them here with preconnect lets the browser start both in
+         parallel, and preloading the hero image gives the LCP a head start. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&display=swap"
+    />
+    <link rel="preload" as="image" href="/assets/revify/hero-birds-1600.webp" imagesrcset="/assets/revify/hero-birds-1600.webp 1600w, /assets/revify/hero-birds-2400.webp 2400w" imagesizes="100vw" />
   </head>
   <body>
     <div id="root"></div>
