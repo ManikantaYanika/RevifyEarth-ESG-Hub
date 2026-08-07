@@ -1,21 +1,17 @@
 # Netlify deployment for the RevifyEarth frontend.
 #
-# This file exists because the site was serving Netlify's 404 at the root while the
-# deploy itself succeeded: the publish directory was set one level above the build
-# output, so `/` resolved to a folder containing only `public/`, and the real page
-# sat at `/public/index.html`.
+# Exists because the site served Netlify's 404 at the root while the deploy itself
+# succeeded: the publish directory pointed one level above the build output, so `/`
+# resolved to a folder containing only `public/` and the real page sat at
+# `/public/index.html`. Pinning the path here keeps it version-controlled so it
+# cannot drift from `build.outDir` again.
 #
-# Settings here override the equivalents in the Netlify UI, so the publish path is
-# now version-controlled and cannot drift from `build.outDir` in
-# `artifacts/revifyearth/vite.config.ts` without someone editing both.
+# Deliberately minimal. Every key below is one that was verified to be needed; no
+# `base` is set, because the previous publish value was repo-root-relative, which
+# means the site has no base directory configured and adding one would re-root the
+# publish path rather than fix it.
 
 [build]
-  # Pinned explicitly. `publish` is resolved *relative to the base directory*, so a
-  # base left set in the Netlify UI would silently re-root the path below — which is
-  # one of the two ways the site ended up publishing the wrong folder. Declaring it
-  # here makes the result independent of any dashboard setting.
-  base = "."
-
   # Runs from the repo root so pnpm workspace links resolve. Only the frontend is
   # built — the API server and mockup sandbox are not part of this deployment.
   command = "pnpm --filter @workspace/revifyearth build"
@@ -23,22 +19,29 @@
   # MUST match `build.outDir` in artifacts/revifyearth/vite.config.ts.
   # That path is `dist/public`, not `dist`, because the Replit artifact manifest
   # (artifacts/revifyearth/.replit-artifact/artifact.toml) declares
-  # `publicDir = "artifacts/revifyearth/dist/public"`. Changing the Vite output to
-  # flatten this would fix Netlify and break Replit, so the publish path moves instead.
+  # `publicDir = "artifacts/revifyearth/dist/public"`. Flattening the Vite output
+  # would fix Netlify and break Replit, so the publish path moves instead.
   publish = "artifacts/revifyearth/dist/public"
 
 [build.environment]
-  # The workspace targets Node 24 and the Vite config uses `import.meta.dirname`
-  # (Node >= 20.11). Netlify's default is older than the project expects.
-  NODE_VERSION = "24"
+  # Vite 7 requires "^20.19.0 || >=22.12.0" and the config uses `import.meta.dirname`
+  # (Node >= 20.11). 22 is the lowest LTS that satisfies both and is present on every
+  # current Netlify build image. Nothing in the frontend needs anything newer.
+  NODE_VERSION = "22"
+
+  # Every build-time module — vite, @vitejs/plugin-react, @tailwindcss/vite and the
+  # Replit error overlay — lives in devDependencies. If NODE_ENV=production is set in
+  # the site's environment, pnpm prunes them at install and the build dies at config
+  # load with "Cannot find module 'vite'". This forces them in regardless.
+  PNPM_FLAGS = "--prod=false"
 
 # --- Redirects, in order. Netlify applies the first rule that matches. ------------
 
 # No API server is deployed alongside this site, so /api must fail rather than be
 # swallowed by the SPA fallback below. Without this it would answer 200 with the
 # HTML shell, the assistant's status probe would see `response.ok === true`, and the
-# failure would only surface later as a JSON parse error. A 404 makes the probe fail
-# deliberately, which hides the chat launcher instead of offering one that cannot work.
+# failure would surface later as a JSON parse error instead. A 404 makes the probe
+# fail deliberately, which hides the chat launcher rather than offering a broken one.
 [[redirects]]
   from = "/api/*"
   to = "/index.html"
