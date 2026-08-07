@@ -1,0 +1,16 @@
+# Netlify redirects, emitted into the build output by Vite's `public/` passthrough.
+#
+# Duplicates the rules in the repo-root netlify.toml on purpose: this file travels
+# inside the published folder, so a drag-and-drop deploy — or any deploy that does
+# not read netlify.toml — still routes correctly. Netlify merges both, applying
+# _redirects first. Keep the two in step.
+#
+# Rules are matched top to bottom; the first match wins.
+
+# No API server accompanies this deployment. Fail explicitly so the assistant's
+# status probe sees a non-OK response and hides the launcher, rather than receiving
+# the HTML shell with a 200 and failing later on JSON.parse.
+/api/*  /index.html  404
+
+# Client-side routing: deep links and refreshes resolve to the SPA shell.
+/*      /index.html  200
