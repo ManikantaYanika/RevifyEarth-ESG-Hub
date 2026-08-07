@@ -7,6 +7,7 @@ import {
   type AssistantMessage,
   type AssistantStatus,
 } from '@/lib/assistant-client';
+import { splitReply } from '@/lib/assistant-format';
 
 /**
  * Conversation state for the RevifyEarth assistant.
@@ -22,6 +23,8 @@ export interface ChatEntry {
   readonly content: string;
   /** Set when a reply stopped early: aborted by the visitor or truncated by the model. */
   readonly incomplete?: boolean;
+  /** Suggested next questions, parsed out of the reply once it completes. */
+  readonly followUps?: readonly string[];
 }
 
 export type ChatPhase = 'idle' | 'waiting' | 'streaming';
@@ -121,21 +124,39 @@ export function useAssistantChat() {
             );
           },
           onDone: ({ truncated }) => {
-            if (!truncated) return;
+            // Parsed once, here, rather than on every render: `content` becomes the
+            // body alone, so the follow-up marker is never replayed to the model as
+            // part of the transcript on the next turn.
             setEntries((current) =>
-              current.map((entry) => (entry.id === replyId ? { ...entry, incomplete: true } : entry)),
+              current.map((entry) => {
+                if (entry.id !== replyId) return entry;
+                const { body, followUps } = splitReply(entry.content);
+                return {
+                  ...entry,
+                  content: body,
+                  ...(followUps.length > 0 ? { followUps } : {}),
+                  ...(truncated ? { incomplete: true } : {}),
+                };
+              }),
             );
           },
         },
         controller.signal,
       );
     } catch (caught) {
-      if (controller.signal.aborted) {
-        // Visitor pressed stop. Whatever streamed is kept and flagged, not discarded.
-        setEntries((current) =>
-          current.map((entry) => (entry.id === replyId ? { ...entry, incomplete: true } : entry)),
-        );
-      } else {
+      // Whatever streamed before the failure is kept and flagged, not discarded —
+      // a partial answer is still worth something to the reader. It is parsed with
+      // the streaming rules so a half-arrived follow-up marker is not left visible.
+      setEntries((current) =>
+        current.map((entry) =>
+          entry.id === replyId
+            ? { ...entry, content: splitReply(entry.content, true).body, incomplete: true }
+            : entry,
+        ),
+      );
+
+      // A visitor-initiated stop is not an error.
+      if (!controller.signal.aborted) {
         setError(
           caught instanceof AssistantError
             ? caught
@@ -160,8 +181,15 @@ export function useAssistantChat() {
     [run],
   );
 
-  /** Drops the last reply and re-runs the turn that produced it. */
-  const regenerate = useCallback(() => {
+  /**
+   * Re-runs the most recent user turn, discarding any reply it produced.
+   *
+   * Shared by "Regenerate" and by "Try again" after a failure. Trimming trailing
+   * assistant entries matters in the error case too: a stream that dies mid-reply
+   * leaves a partial assistant entry behind, and re-sending a history that ends with
+   * one is rejected by the server ("the final message must be from the user").
+   */
+  const rerunLastTurn = useCallback(() => {
     if (abortRef.current) return;
 
     const current = entriesRef.current;
@@ -171,16 +199,8 @@ export function useAssistantChat() {
 
     const history = current.slice(0, end);
     setEntries(history);
-    void run(history);
-  }, [run]);
-
-  /** Re-sends the last user turn after a failure, without duplicating it. */
-  const retry = useCallback(() => {
-    if (abortRef.current) return;
-    const current = entriesRef.current;
-    if (current.length === 0) return;
     setError(null);
-    void run(current);
+    void run(history);
   }, [run]);
 
   const stop = useCallback(() => {
@@ -208,7 +228,7 @@ export function useAssistantChat() {
     send,
     stop,
     clear,
-    regenerate,
-    retry,
+    regenerate: rerunLastTurn,
+    retry: rerunLastTurn,
   };
 }

@@ -96,13 +96,16 @@ export function Contact() {
       />
 
       {/* Contact cards */}
-      <section className="mx-auto max-w-[1440px] px-5 py-20 md:px-10 md:py-24">
+      <section className="mx-auto max-w-[1440px] px-5 py-14 sm:py-16 md:px-10 md:py-24">
         <SectionLabel>Direct lines</SectionLabel>
         <div className="grid gap-px border border-[#b8c9bd] bg-[#b8c9bd] md:grid-cols-2 lg:grid-cols-4">
           <Reveal className="bg-[#f2f0e8] p-7">
             <Mail className="h-5 w-5 text-[#24626b]" aria-hidden="true" />
             <p className="eyebrow mt-5 text-[#24626b]">General enquiries</p>
-            <a href={`mailto:${company.email}`} className="focus-ring mt-3 block rounded-sm text-lg font-bold hover:underline">
+            <a
+              href={`mailto:${company.email}`}
+              className="focus-ring mt-3 flex min-h-11 items-center break-all rounded-sm text-lg font-bold hover:underline"
+            >
               {company.email}
             </a>
           </Reveal>
@@ -112,7 +115,12 @@ export function Contact() {
               <Phone className="h-5 w-5 text-[#24626b]" aria-hidden="true" />
               <p className="eyebrow mt-5 text-[#24626b]">{contact.role}</p>
               <p className="mt-3 text-lg font-bold">{contact.name}</p>
-              <a href={`tel:${contact.phone}`} className="focus-ring mt-1 block rounded-sm text-sm hover:underline">
+              {/* min-h-11: a phone number is the most likely thing to be tapped on
+                  this page, and a 20px line box is well under any touch guidance. */}
+              <a
+                href={`tel:${contact.phone}`}
+                className="focus-ring mt-1 inline-flex min-h-11 items-center rounded-sm text-sm hover:underline"
+              >
                 {contact.phone}
               </a>
             </Reveal>
@@ -128,7 +136,7 @@ export function Contact() {
               href={company.website}
               target="_blank"
               rel="noreferrer"
-              className="focus-ring mt-3 inline-flex items-center gap-2 rounded-sm text-sm hover:underline"
+              className="focus-ring mt-3 inline-flex min-h-11 items-center gap-2 rounded-sm text-sm hover:underline"
             >
               revifyearth.com <ExternalLink className="h-3.5 w-3.5" />
             </a>
@@ -137,7 +145,7 @@ export function Contact() {
       </section>
 
       {/* Enquiry form */}
-      <section className="bg-[#a8c95a] px-5 py-20 text-[#142b32] md:px-10 md:py-28">
+      <section className="bg-[#a8c95a] px-5 py-14 sm:py-16 text-[#142b32] md:px-10 md:py-28">
         <div className="mx-auto grid max-w-[1200px] gap-14 md:grid-cols-[.8fr_1.2fr]">
           <div>
             <SectionLabel>The conversation</SectionLabel>

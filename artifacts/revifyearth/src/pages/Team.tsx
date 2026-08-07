@@ -23,7 +23,11 @@ function MemberGrid({ members, label }: { members: readonly TeamMember[]; label:
               />
             </div>
             <h3 className="text-lg font-extrabold">{member.name}</h3>
-            <p className="mt-1 font-mono-custom text-[10px] uppercase tracking-wider text-[#24626b]">{member.role}</p>
+            {/* 10px uppercase mono is legible beside a portrait on a desktop grid but
+                not on a phone; raised below `sm` only, leaving the desktop card as drawn. */}
+            <p className="mt-1 font-mono-custom text-xs uppercase tracking-wider text-[#24626b] lg:text-[10px]">
+              {member.role}
+            </p>
             {member.bio && <p className="mt-3 text-xs leading-6 text-[#3d5a5f]">{member.bio}</p>}
           </Reveal>
         ))}
@@ -50,7 +54,7 @@ export function Team() {
         image={media.heroBirds}
       />
 
-      <section className="bg-[#e7dfd0] px-5 py-24 md:px-10 md:py-32">
+      <section className="bg-[#e7dfd0] px-5 py-16 sm:py-20 md:px-10 md:py-32">
         <div className="mx-auto flex max-w-[1440px] flex-col gap-20">
           <MemberGrid members={foundingTeam} label="Founding team" />
           <MemberGrid members={designTeam} label="Core designing team" />

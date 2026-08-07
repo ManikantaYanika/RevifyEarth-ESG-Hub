@@ -22,7 +22,7 @@ export function Services() {
         image={media.volcano}
       />
 
-      <section className="bg-[#dce5d0] px-5 py-20 md:px-10 md:py-28">
+      <section className="bg-[#dce5d0] px-5 py-14 sm:py-16 md:px-10 md:py-28">
         <div className="mx-auto max-w-[1440px]">
           <SectionLabel as="h2">Seven services</SectionLabel>
           <div className="mt-4 border-t border-[#8ba59a]">

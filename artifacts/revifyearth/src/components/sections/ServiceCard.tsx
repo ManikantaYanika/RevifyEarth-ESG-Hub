@@ -64,7 +64,7 @@ export function ServiceCard({ service, defaultOpen = false }: { service: Service
               </span>
               <span className="mt-3 block max-w-2xl text-sm leading-7 text-[#3d5a5f]">{service.summary}</span>
               {service.complementary && (
-                <span className="mt-3 inline-block border border-[#a8c95a] px-2.5 py-1 font-mono-custom text-[10px] uppercase tracking-widest text-[#24626b]">
+                <span className="mt-3 inline-block border border-[#a8c95a] px-2.5 py-1 font-mono-custom text-xs uppercase tracking-widest text-[#24626b] lg:text-[10px]">
                   Complementary
                 </span>
               )}
@@ -114,7 +114,7 @@ export function ServiceCard({ service, defaultOpen = false }: { service: Service
                 <ol className="mt-5 grid gap-px border border-[#c3d2c4] bg-[#c3d2c4] md:grid-cols-2 xl:grid-cols-3">
                   {service.stages.map((stage) => (
                     <li key={stage.index} className="bg-[#eef1e6] p-6">
-                      <span className="font-mono-custom text-[10px] text-[#24626b]">{stage.index}</span>
+                      <span className="font-mono-custom text-xs text-[#24626b] lg:text-[10px]">{stage.index}</span>
                       <p className="mt-3 text-sm font-bold">{stage.title}</p>
                       <ul className="mt-3 space-y-2">
                         {stage.points.map((point) => (
@@ -161,7 +161,7 @@ export function ServiceCard({ service, defaultOpen = false }: { service: Service
                         <Link
                           key={slug}
                           href={`/services/${slug}`}
-                          className="focus-ring inline-flex items-center gap-2 rounded-full border border-[#8ba59a] px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-[#24626b] transition-colors hover:border-[#24626b] hover:bg-[#24626b] hover:text-[#f2f0e8]"
+                          className="focus-ring inline-flex min-h-11 items-center gap-2 rounded-full border border-[#8ba59a] px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-[#24626b] lg:text-[10px] transition-colors hover:border-[#24626b] hover:bg-[#24626b] hover:text-[#f2f0e8]"
                         >
                           {related.shortTitle}
                           <ArrowUpRight className="h-3 w-3" />

@@ -9,7 +9,7 @@ export function FaqAccordion() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="faqs" className="scroll-mt-24 px-5 py-24 md:px-10 md:py-32">
+    <section id="faqs" className="scroll-mt-24 px-5 py-16 sm:py-20 md:px-10 md:py-32">
       <div className="mx-auto max-w-[1440px]">
         <div className="grid gap-12 md:grid-cols-[.7fr_1.3fr]">
           <div>
@@ -61,7 +61,7 @@ function PendingCard({ section, order }: { section: PendingSection; order: numbe
     <Reveal order={order} className="border border-dashed border-[#8ba59a] bg-[#eef1e6]/60 p-7">
       <div className="flex items-center gap-3">
         <FileClock className="h-4 w-4 text-[#24626b]" aria-hidden="true" />
-        <span className="font-mono-custom text-[10px] uppercase tracking-widest text-[#24626b]">
+        <span className="font-mono-custom text-xs uppercase tracking-widest text-[#24626b] lg:text-[10px]">
           Awaiting verified content
         </span>
       </div>
@@ -90,7 +90,7 @@ function PendingCard({ section, order }: { section: PendingSection; order: numbe
  */
 export function PendingTrustSections() {
   return (
-    <section className="bg-[#dce5d0] px-5 py-24 md:px-10 md:py-32">
+    <section className="bg-[#dce5d0] px-5 py-16 sm:py-20 md:px-10 md:py-32">
       <div className="mx-auto max-w-[1440px]">
         <SectionLabel>Proof & recognition</SectionLabel>
         <div className="grid gap-10 md:grid-cols-[.9fr_1.1fr]">

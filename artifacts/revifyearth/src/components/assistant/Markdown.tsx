@@ -18,10 +18,10 @@ const components: Components = {
   p: ({ children }) => <p className="mb-3 leading-6 last:mb-0">{children}</p>,
 
   h1: ({ children }) => (
-    <h3 className="mb-2 mt-4 text-[13px] font-bold text-[#f2f0e8] first:mt-0">{children}</h3>
+    <h3 className="mb-2 mt-4 text-sm font-bold text-[#f2f0e8] first:mt-0 sm:text-[13px]">{children}</h3>
   ),
   h2: ({ children }) => (
-    <h3 className="mb-2 mt-4 text-[13px] font-bold text-[#f2f0e8] first:mt-0">{children}</h3>
+    <h3 className="mb-2 mt-4 text-sm font-bold text-[#f2f0e8] first:mt-0 sm:text-[13px]">{children}</h3>
   ),
   h3: ({ children }) => (
     <h4 className="mb-2 mt-3 text-[12px] font-bold text-[#f2f0e8] first:mt-0">{children}</h4>
@@ -114,7 +114,9 @@ const components: Components = {
  */
 export const Markdown = memo(function Markdown({ content }: { content: string }) {
   return (
-    <div className="text-xs text-white/80">
+    // 13px on a phone, 12px in the narrower desktop card. A consultant-length answer
+    // at 12px on a 320px screen is a wall of grey.
+    <div className="text-[13px] text-white/80 sm:text-xs">
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
         {content}
       </ReactMarkdown>

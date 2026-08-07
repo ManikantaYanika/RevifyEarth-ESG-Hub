@@ -30,7 +30,7 @@ export function Projects() {
         image={media.mountainSunset}
       />
 
-      <section className="mx-auto max-w-[1440px] px-5 py-24 md:px-10 md:py-32">
+      <section className="mx-auto max-w-[1440px] px-5 py-16 sm:py-20 md:px-10 md:py-32">
         <SectionLabel>How an engagement is built</SectionLabel>
         <div className="grid gap-10 md:grid-cols-[.9fr_1.1fr]">
           <h2 className="font-display max-w-md text-5xl leading-[.98] text-[#24626b] md:text-7xl">

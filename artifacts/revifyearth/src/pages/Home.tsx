@@ -29,7 +29,10 @@ function VideoApproachModal({ onClose }: { onClose: () => void }) {
       </p>
       <div className="mt-8 flex flex-wrap gap-2">
         {['5–7 minutes', 'Full HD 1080p', '2 × 30-second social cutdowns', 'Report identity'].map((item) => (
-          <span key={item} className="border border-[#b8c9bd] px-3 py-2 font-mono-custom text-[10px]">
+          <span
+            key={item}
+            className="border border-[#b8c9bd] px-3 py-2 font-mono-custom text-xs lg:text-[10px]"
+          >
             {item}
           </span>
         ))}
@@ -92,7 +95,7 @@ export function Home() {
       </section>
 
       {/* Proposition */}
-      <section className="mx-auto grid max-w-[1440px] gap-12 px-5 py-24 md:grid-cols-[.8fr_1.2fr] md:px-10 md:py-36">
+      <section className="mx-auto grid max-w-[1440px] gap-12 px-5 py-16 sm:py-20 md:grid-cols-[.8fr_1.2fr] md:px-10 md:py-36">
         <div>
           <SectionLabel>The proposition</SectionLabel>
           <p className="font-display text-4xl leading-[1.05] tracking-[-.035em] text-[#24626b] md:text-6xl">
@@ -126,7 +129,7 @@ export function Home() {
       <EcosystemFlow />
 
       {/* Services preview */}
-      <section className="mx-auto max-w-[1440px] px-5 py-24 md:px-10 md:py-32">
+      <section className="mx-auto max-w-[1440px] px-5 py-16 sm:py-20 md:px-10 md:py-32">
         <SectionLabel>What we do</SectionLabel>
         <div className="grid gap-10 md:grid-cols-[.8fr_1.2fr]">
           <h2 className="font-display max-w-md text-5xl leading-[.98] md:text-7xl">
@@ -175,7 +178,7 @@ export function Home() {
       <QuoteBand>Clarity is a form of leadership.</QuoteBand>
 
       {/* Industries preview */}
-      <section className="mx-auto max-w-[1440px] px-5 py-24 md:px-10 md:py-32">
+      <section className="mx-auto max-w-[1440px] px-5 py-16 sm:py-20 md:px-10 md:py-32">
         <div className="flex flex-wrap items-end justify-between gap-8">
           <div>
             <SectionLabel>Industries we serve</SectionLabel>
@@ -208,7 +211,7 @@ export function Home() {
       </section>
 
       {/* Video report */}
-      <section className="relative isolate overflow-hidden bg-[#142b32] px-5 py-24 text-[#f2f0e8] md:px-10 md:py-32">
+      <section className="relative isolate overflow-hidden bg-[#142b32] px-5 py-16 sm:py-20 text-[#f2f0e8] md:px-10 md:py-32">
         <ResponsiveImage
           asset={media.mountainSunset}
           alt=""
@@ -232,7 +235,7 @@ export function Home() {
             <button
               type="button"
               onClick={() => setShowVideo(true)}
-              className="focus-ring mt-8 inline-flex items-center gap-3 rounded-full bg-[#a8c95a] px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest text-[#142b32] transition-transform hover:-translate-y-0.5"
+              className="focus-ring mt-8 inline-flex min-h-11 items-center gap-3 rounded-full bg-[#a8c95a] px-5 py-3 text-[11px] lg:text-[10px] font-extrabold uppercase tracking-widest text-[#142b32] transition-transform hover:-translate-y-0.5"
               data-testid="button-video-preview"
             >
               <Play className="h-3.5 w-3.5 fill-current" /> Watch the approach

@@ -36,7 +36,7 @@ export function ServiceDetail({ slug }: { slug: string }) {
       </PageHero>
 
       {/* Overview + business value */}
-      <section className="mx-auto grid max-w-[1440px] gap-12 px-5 py-24 md:grid-cols-[.8fr_1.2fr] md:px-10 md:py-32">
+      <section className="mx-auto grid max-w-[1440px] gap-12 px-5 py-16 sm:py-20 md:grid-cols-[.8fr_1.2fr] md:px-10 md:py-32">
         <div>
           <SectionLabel>Overview</SectionLabel>
           <h2 className="font-display text-4xl leading-[.98] text-[#24626b] md:text-6xl">
@@ -68,7 +68,7 @@ export function ServiceDetail({ slug }: { slug: string }) {
       </section>
 
       {/* Workflow */}
-      <section className="bg-[#24626b] px-5 py-24 text-[#f2f0e8] md:px-10 md:py-32">
+      <section className="bg-[#24626b] px-5 py-16 sm:py-20 text-[#f2f0e8] md:px-10 md:py-32">
         <div className="mx-auto max-w-[1440px]">
           <SectionLabel light>Workflow</SectionLabel>
           <h2 className="font-display max-w-2xl text-5xl leading-[.98] md:text-7xl">
@@ -79,7 +79,7 @@ export function ServiceDetail({ slug }: { slug: string }) {
           <ol className="mt-14 grid gap-px bg-white/15 md:grid-cols-2 xl:grid-cols-3">
             {service.stages.map((stage, index) => (
               <Reveal as="li" key={stage.index} order={index % 3} className="bg-[#24626b] p-8">
-                <span className="font-mono-custom text-[10px] text-[#a8c95a]">{stage.index}</span>
+                <span className="font-mono-custom text-xs text-[#a8c95a] lg:text-[10px]">{stage.index}</span>
                 <h3 className="mt-6 text-lg font-bold">{stage.title}</h3>
                 <ul className="mt-4 space-y-2.5">
                   {stage.points.map((point) => (
@@ -96,7 +96,7 @@ export function ServiceDetail({ slug }: { slug: string }) {
       </section>
 
       {/* Deliverables + timeline */}
-      <section className="mx-auto max-w-[1440px] px-5 py-24 md:px-10 md:py-32">
+      <section className="mx-auto max-w-[1440px] px-5 py-16 sm:py-20 md:px-10 md:py-32">
         <div className="grid gap-12 lg:grid-cols-[1.2fr_.8fr]">
           <div>
             <SectionLabel>Deliverables</SectionLabel>
@@ -131,7 +131,7 @@ export function ServiceDetail({ slug }: { slug: string }) {
       </section>
 
       {/* FAQ + related */}
-      <section className="bg-[#e7dfd0] px-5 py-24 md:px-10 md:py-32">
+      <section className="bg-[#e7dfd0] px-5 py-16 sm:py-20 md:px-10 md:py-32">
         <div className="mx-auto grid max-w-[1440px] gap-12 md:grid-cols-[.7fr_1.3fr]">
           <div>
             <SectionLabel>Questions</SectionLabel>
@@ -162,7 +162,9 @@ export function ServiceDetail({ slug }: { slug: string }) {
                       <Link
                         key={relatedSlug}
                         href={`/services/${relatedSlug}`}
-                        className="focus-ring inline-flex items-center gap-2 rounded-full border border-[#bbaf9d] px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-[#24626b] transition-colors hover:bg-[#24626b] hover:text-[#f2f0e8]"
+                        // min-h-11: these pills are the primary route between service
+                        // pages on a phone, and py-2 left them at 33px.
+                        className="focus-ring inline-flex min-h-11 items-center gap-2 rounded-full border border-[#bbaf9d] px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-[#24626b] lg:text-[10px] transition-colors hover:bg-[#24626b] hover:text-[#f2f0e8]"
                       >
                         {related.shortTitle}
                         <ArrowUpRight className="h-3 w-3" />

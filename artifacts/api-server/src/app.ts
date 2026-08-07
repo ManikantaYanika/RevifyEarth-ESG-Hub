@@ -98,14 +98,35 @@ app.use((error: unknown, req: Request, res: Response, _next: NextFunction) => {
     return;
   }
 
-  const isBodyParseError =
-    typeof error === "object" &&
-    error !== null &&
-    "type" in error &&
-    (error as { type?: string }).type === "entity.too.large";
+  /**
+   * Client faults raised before a route runs — body-parser rejecting unparseable
+   * JSON, an oversized body, a bad charset. They carry a 4xx `status` and
+   * `expose: true`, and reporting them as 500 both misattributes the fault and
+   * tells the caller to retry something that can never succeed.
+   *
+   * The status is honoured; the message never is. `expose: true` means body-parser
+   * considers its own text safe, but it can quote the offending payload, so a
+   * fixed message is returned instead.
+   */
+  const candidate = error as { type?: string; status?: unknown; statusCode?: unknown };
+  const rawStatus =
+    typeof candidate?.status === "number"
+      ? candidate.status
+      : typeof candidate?.statusCode === "number"
+        ? candidate.statusCode
+        : undefined;
+  const isClientFault =
+    typeof rawStatus === "number" && rawStatus >= 400 && rawStatus < 500;
 
-  if (isBodyParseError) {
-    res.status(413).json({ code: "payload_too_large", message: "Request body is too large." });
+  if (isClientFault) {
+    const [code, message] =
+      candidate.type === "entity.too.large"
+        ? (["payload_too_large", "Request body is too large."] as const)
+        : candidate.type === "entity.parse.failed"
+          ? (["invalid_json", "Request body is not valid JSON."] as const)
+          : (["invalid_request", "That request could not be processed."] as const);
+
+    res.status(rawStatus).json({ code, message });
     return;
   }
 

@@ -22,7 +22,7 @@ export function Industries() {
         image={media.volcano}
       />
 
-      <section className="mx-auto max-w-[1440px] px-5 py-20 md:px-10 md:py-28">
+      <section className="mx-auto max-w-[1440px] px-5 py-14 sm:py-16 md:px-10 md:py-28">
         <SectionLabel>Six sectors</SectionLabel>
         <p className="max-w-2xl text-sm leading-7 text-[#3d5a5f]">
           The reporting challenges described below are properties of each sector’s disclosure profile under GRI and
@@ -60,7 +60,7 @@ export function Industries() {
                       {industry.focus.map((item) => (
                         <li
                           key={item}
-                          className="border border-[#b8c9bd] px-3 py-2 font-mono-custom text-[10px] text-[#24626b]"
+                          className="border border-[#b8c9bd] px-3 py-2 font-mono-custom text-xs text-[#24626b] lg:text-[10px]"
                         >
                           {item}
                         </li>
