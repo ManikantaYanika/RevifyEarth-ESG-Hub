@@ -1,7 +1,6 @@
 import { MessageCircle, X } from 'lucide-react';
 import { Suspense, lazy, useEffect, useState } from 'react';
 
-import { fetchAssistantStatus } from '@/lib/assistant-client';
 import { useBodyScrollLock } from '@/hooks/use-body-scroll-lock';
 
 /**
@@ -9,6 +8,12 @@ import { useBodyScrollLock } from '@/hooks/use-body-scroll-lock';
  *
  * Lives in the app shell so the conversation survives navigation — mounted per page
  * it used to be torn down on every route change.
+ *
+ * The launcher renders unconditionally. It deliberately does not probe
+ * `/api/assistant/status` first: on a static deployment with no API server that probe
+ * fails, and gating on it removed the assistant from the site entirely. Availability
+ * is now the panel's concern — it opens either way and explains itself if the service
+ * cannot be reached.
  *
  * The panel is code-split: react-markdown and remark-gfm are roughly 60 kB gzipped
  * and would otherwise sit in the initial bundle of a marketing site whose visitors
@@ -31,20 +36,6 @@ function PanelSkeleton() {
 
 export function Assistant() {
   const [open, setOpen] = useState(false);
-  /** `null` until the capability probe resolves, so the button never flashes in and out. */
-  const [available, setAvailable] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    fetchAssistantStatus(controller.signal)
-      .then((status) => setAvailable(status.available))
-      .catch(() => {
-        // No endpoint, or no key configured. Offering a launcher that always fails
-        // is worse than not offering one.
-        if (!controller.signal.aborted) setAvailable(false);
-      });
-    return () => controller.abort();
-  }, []);
 
   // Body scroll lock while the mobile sheet covers the page. Desktop keeps the page
   // scrollable behind the floating card, so this only applies below `sm`. Tracked as
@@ -59,8 +50,6 @@ export function Assistant() {
   }, []);
 
   useBodyScrollLock(open && isSheet);
-
-  if (available === false) return null;
 
   return (
     <>

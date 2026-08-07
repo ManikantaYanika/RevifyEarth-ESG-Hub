@@ -85,8 +85,10 @@ export function useAssistantChat() {
     fetchAssistantStatus(controller.signal)
       .then(setStatus)
       .catch(() => {
-        // Probe failure is not surfaced: the launcher stays hidden and a send would
-        // report the real error anyway.
+        // A failed probe means no reachable API — a static deployment with no server
+        // behind it, or the service being down. The panel renders an explanatory
+        // state from this rather than the composer, so the visitor is told what is
+        // happening instead of typing into something that cannot answer.
         setStatus({ available: false, maxMessageLength: 2000, maxHistoryMessages: 20 });
       });
     return () => controller.abort();

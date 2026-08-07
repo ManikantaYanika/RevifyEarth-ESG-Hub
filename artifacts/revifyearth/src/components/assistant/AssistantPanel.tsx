@@ -158,6 +158,11 @@ export default function AssistantPanel({ onClose }: { onClose: () => void }) {
 
   const empty = entries.length === 0;
   const remaining = maxLength - draft.length;
+  /**
+   * `status` is `null` until the capability probe resolves, so this stays false for
+   * that first moment — the panel must not flash "unavailable" before it knows.
+   */
+  const unavailable = status?.available === false;
 
   return (
     <div
@@ -212,7 +217,42 @@ export default function AssistantPanel({ onClose }: { onClose: () => void }) {
         onScroll={handleScroll}
         className="flex-1 space-y-4 overflow-y-auto overscroll-contain px-5 py-4"
       >
-        {empty && (
+        {/* Service unreachable. Shown in place of the composer's affordances rather
+            than instead of the panel, so the visitor gets an explanation and a way to
+            reach a human instead of a control that silently does nothing. */}
+        {unavailable && (
+          <div role="status" className="space-y-4">
+            <div className="flex items-start gap-2.5 rounded-sm border border-white/15 bg-white/3 px-3.5 py-3.5">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#a8c95a]" aria-hidden="true" />
+              <div className="min-w-0">
+                <p className="text-[13px] font-bold text-[#f2f0e8] sm:text-xs">
+                  Assistant temporarily unavailable
+                </p>
+                <p className="mt-1.5 text-[13px] leading-6 text-white/70 sm:text-xs">
+                  The ESG assistant cannot be reached right now. Everything else on the site works
+                  normally, and the team is happy to answer the same questions directly.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <a
+                href="mailto:info@revifyearth.com"
+                className="focus-ring flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-[#a8c95a] px-4 text-[11px] font-extrabold uppercase tracking-[.14em] text-[#142b32]"
+              >
+                Email info@revifyearth.com
+              </a>
+              <a
+                href="/contact"
+                className="focus-ring flex min-h-11 w-full items-center justify-center rounded-full border border-white/25 px-4 text-[11px] font-extrabold uppercase tracking-[.14em] text-[#f2f0e8] transition-colors hover:border-[#a8c95a] hover:text-[#a8c95a]"
+              >
+                Book a consultation
+              </a>
+            </div>
+          </div>
+        )}
+
+        {empty && !unavailable && (
           <div className="space-y-5">
             <p className="text-[13px] leading-6 text-white/70 sm:text-xs">
               Ask about sustainability reporting, GRI and BRSR alignment, or how a RevifyEarth
@@ -314,8 +354,8 @@ export default function AssistantPanel({ onClose }: { onClose: () => void }) {
             onChange={onInput}
             onKeyDown={onKeyDown}
             maxLength={maxLength}
-            disabled={busy}
-            placeholder="Ask about ESG reporting…"
+            disabled={busy || unavailable}
+            placeholder={unavailable ? 'Assistant unavailable' : 'Ask about ESG reporting…'}
             aria-describedby="assistant-input-hint"
             className="focus-ring min-h-[44px] w-full flex-1 resize-none rounded-sm bg-white/5 px-3 py-3 text-[16px] leading-5 text-white placeholder:text-white/40 disabled:opacity-50 sm:text-xs"
           />
@@ -332,7 +372,7 @@ export default function AssistantPanel({ onClose }: { onClose: () => void }) {
           ) : (
             <button
               type="submit"
-              disabled={!draft.trim()}
+              disabled={!draft.trim() || unavailable}
               aria-label="Send message"
               className="focus-ring flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#a8c95a] text-[#142b32] transition-opacity disabled:opacity-35"
             >
@@ -342,7 +382,11 @@ export default function AssistantPanel({ onClose }: { onClose: () => void }) {
         </div>
 
         <p id="assistant-input-hint" className="mt-1.5 flex justify-between text-[10px] text-white/35">
-          <span>Enter to send · Shift+Enter for a new line</span>
+          <span>
+            {unavailable
+              ? 'Chat is offline — use the links above to reach the team'
+              : 'Enter to send · Shift+Enter for a new line'}
+          </span>
           {remaining < 200 && <span aria-live="polite">{remaining} left</span>}
         </p>
       </form>
