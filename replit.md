@@ -140,7 +140,13 @@ RevifyEarth is the official website for Revify Private Limited, presenting its E
 ## Gotchas
 
 - Use `pnpm --filter @workspace/revifyearth run typecheck` for the frontend check.
-- Keep `PORT` and `BASE_PATH` workflow-provided; do not run the frontend directly without them.
+- `PORT` and `BASE_PATH` are optional. Both Vite configs resolve the port inside the
+  `defineConfig` factory and only for `command === 'serve'`, so **`vite build` never
+  reads them** — requiring them at module scope broke every static host (Netlify,
+  Vercel), which has no reason to define a port. Unset, dev falls back to 5173/5174
+  without `strictPort`; when the workflow supplies `PORT` it is validated and bound
+  strictly, because Replit needs that exact port. `BASE_PATH` defaults to '/' and
+  remains the override for a sub-path mount.
 - `ASSISTANT_ALLOWED_ORIGINS` must list any origin that serves the SPA from a different host
   to the API. Left empty, CORS permits same-origin only — correct when both are served from
   this host, and correct in development because Vite proxies `/api`.
