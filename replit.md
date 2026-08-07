@@ -139,6 +139,17 @@ RevifyEarth is the official website for Revify Private Limited, presenting its E
 
 ## Gotchas
 
+- Replit's Vite plugins are loaded **dynamically and only when `command === 'serve'`**.
+  A top-level `import` of the runtime-error overlay made a static host's build depend on
+  a Replit devDependency being installed: with `NODE_ENV=production` at install time pnpm
+  prunes devDependencies and the config fails to load with "Cannot find module" before
+  Vite reads a source file. Verified by building with those packages physically removed.
+- `netlify.toml` sets `PNPM_FLAGS=--prod=false` for the same reason: every build-time
+  module (vite, the react and tailwind plugins) lives in devDependencies.
+- The shadcn components under `src/components/ui/` carried Next.js `'use client'`
+  directives. They are inert in a Vite SPA but Rollup warns on the one that reaches the
+  bundle. Removed; do not reintroduce them when copying new shadcn components in.
+
 - Use `pnpm --filter @workspace/revifyearth run typecheck` for the frontend check.
 - `PORT` and `BASE_PATH` are optional. Both Vite configs resolve the port inside the
   `defineConfig` factory and only for `command === 'serve'`, so **`vite build` never

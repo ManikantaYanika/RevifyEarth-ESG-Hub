@@ -3,8 +3,6 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, type UserConfig } from 'vite';
 
-import runtimeErrorOverlay from '@replit/vite-plugin-runtime-error-modal';
-
 const DEFAULT_DEV_PORT = 5173;
 
 /**
@@ -57,15 +55,26 @@ export default defineConfig(async ({ command }): Promise<UserConfig> => {
     plugins: [
       react(),
       tailwindcss(),
-      runtimeErrorOverlay(),
-      ...(process.env.NODE_ENV !== 'production' && process.env.REPL_ID !== undefined
+      // Every Replit plugin is loaded dynamically and only when serving. They are
+      // dev tooling — an error modal, a source mapper, a banner — with nothing to
+      // contribute to a production bundle, and all three live in devDependencies.
+      // A top-level `import` of the error overlay made a static host's build depend
+      // on a Replit package being installed: if `NODE_ENV=production` prunes dev
+      // dependencies, the config fails to load and the deploy dies with
+      // "Cannot find module", before Vite reads a single source file.
+      ...(command === 'serve'
         ? [
-            await import('@replit/vite-plugin-cartographer').then((m) =>
-              m.cartographer({
-                root: path.resolve(import.meta.dirname, '..'),
-              }),
-            ),
-            await import('@replit/vite-plugin-dev-banner').then((m) => m.devBanner()),
+            await import('@replit/vite-plugin-runtime-error-modal').then((m) => m.default()),
+            ...(process.env.REPL_ID !== undefined
+              ? [
+                  await import('@replit/vite-plugin-cartographer').then((m) =>
+                    m.cartographer({
+                      root: path.resolve(import.meta.dirname, '..'),
+                    }),
+                  ),
+                  await import('@replit/vite-plugin-dev-banner').then((m) => m.devBanner()),
+                ]
+              : []),
           ]
         : []),
     ],
