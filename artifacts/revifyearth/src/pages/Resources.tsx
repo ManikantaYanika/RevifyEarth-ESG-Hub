@@ -24,7 +24,7 @@ export function Resources() {
 
       <FrameworkStrip />
 
-      <section id="insights" className="mx-auto max-w-[1440px] scroll-mt-24 px-5 py-24 md:px-10 md:py-32">
+      <section id="insights" className="mx-auto max-w-[1440px] scroll-mt-24 px-5 py-16 sm:py-20 md:px-10 md:py-32">
         <div className="flex flex-wrap items-end justify-between gap-8">
           <div>
             <SectionLabel>Insights</SectionLabel>

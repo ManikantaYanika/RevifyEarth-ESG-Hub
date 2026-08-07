@@ -327,6 +327,19 @@ Engagement maturity across reporting cycles:
       "travel",
       "not included",
       "cover",
+      // The scope boundary is the single most important thing to get right, so it
+      // is reachable from the plain-language forms too: "can you assure our data",
+      // "do you verify the numbers", "who calculates this".
+      "assure",
+      "verify",
+      "certify",
+      "guarantee",
+      "esg data",
+      "our data",
+      "the data",
+      "calculate",
+      "calculation",
+      "collect",
     ],
     body: `## What is included in an engagement
 - Project management across all agreed workstreams
@@ -418,11 +431,45 @@ Positioning: experts from different walks — from experienced retired governmen
       "energy",
       "consumer",
       "vertical",
+      // Sector names as visitors actually type them. Without these, "do you work
+      // with BFSI clients?" scored only on "client" and retrieved the trust
+      // document instead of the sector context the question was asking for.
+      "bfsi",
+      "banking",
+      "insurance",
+      "life sciences",
+      "pharma",
+      "hospital",
+      "infrastructure",
+      "built environment",
+      "construction",
+      "real estate",
+      "utilities",
+      "mining",
+      "oil",
+      "chemicals",
+      "cement",
+      "steel",
+      "automotive",
+      "logistics",
+      "retail",
+      "fmcg",
+      "textile",
+      "it services",
+      "data centre",
+      "data center",
     ],
-    body: `## Target sectors
-RevifyEarth positions its work across six sectors, framed by each sector's disclosure profile. These are TARGET sectors and sector-level context — they are NOT a claim of completed client work in each one. Do not describe them as past clients or case studies.
+    body: `## Target sectors (/industries)
+RevifyEarth frames its work across six sectors by each sector's DISCLOSURE PROFILE. These are TARGET sectors and sector-level reporting context — they are NOT a claim of completed client work in any of them. Never describe them as past clients, case studies or references.
 
-The site lists these at /industries. If a visitor asks whether RevifyEarth has worked in their sector, say that published engagement references are not yet available on the site and direct them to the team at info@revifyearth.com, who can speak to relevant experience directly.`,
+1. Healthcare & Life Sciences — the social dimension carries as much weight as the environmental one. Care-delivery organisations hold rich workforce, access and outcome data, but it rarely arrives in the report as a connected narrative; the environmental footprint sits across facilities, logistics and a long supplier tail. Reporting focus: workforce wellbeing and retention narrative; access and patient-outcome disclosure; facilities energy and clinical waste; supply-chain and Scope 3 boundaries.
+2. Manufacturing — the numbers are usually strong and the story underbuilt. Emissions intensity, water and waste data are typically well instrumented; the gap is contextualisation — what the trend means, what drove it, what happens next. Focus: emissions intensity and decarbonisation pathway; circularity and materials narrative; water stewardship; supplier and value-chain disclosure.
+3. BFSI — governance depth and financed impact define the disclosure. The material footprint sits in the portfolio rather than the premises, so reporting must make governance structures and financed exposure legible without drowning the reader in methodology. Focus: financed emissions framing; governance and board oversight depth; BRSR alignment and cross-referencing; responsible product and inclusion narrative.
+4. Energy & Resources — transition credibility is the entire communication problem. Stakeholders arrive sceptical; disclosure has to hold operational complexity, transition commitments and the human consequences of change in one narrative without special pleading. Focus: transition pathway and interim targets; decarbonisation interventions; just-transition and community narrative; climate risk integration.
+5. IT & Business Services — value is people-led and the footprint mostly indirect. Direct emissions are modest, so credibility rests on Scope 3, data-centre energy and the quality of the human-capital story. Focus: Scope 3 boundary and methodology clarity; data-centre and cloud energy narrative; human capital, skills and inclusion; client and community value creation.
+6. Infrastructure & Built Environment — decisions outlive the reporting cycle by decades. Embodied carbon, land use and community impact play out over asset lifetimes, so annual reporting has to connect a single year to a multi-decade commitment. Focus: embodied carbon and materials selection; land use, biodiversity and community impact; long-horizon asset resilience; safety and workforce disclosure.
+
+If a visitor asks whether RevifyEarth has worked in their sector, say that published engagement references are not yet available on the site, and direct them to info@revifyearth.com, where the team can speak to relevant experience directly. If their sector is not among the six, do not refuse — the reporting disciplines transfer; describe the disclosure considerations that apply and suggest confirming fit with the team.`,
   },
   {
     id: "esg-frameworks",
@@ -498,24 +545,211 @@ Pricing is scoped per engagement and is NOT published. You do not have access to
 
 Correct response: explain that pricing depends on scope — which workstreams are included, report length, print quantity and whether film and web are in scope — and direct the visitor to info@revifyearth.com or the contact page at /contact for a scoped proposal. Offer to summarise which workstreams they appear to need, since that is what a quote is built from.`,
   },
+  {
+    id: "about-company",
+    keywords: [
+      "about",
+      "mission",
+      "vision",
+      "philosophy",
+      "origin",
+      "history",
+      "founded",
+      "story",
+      "purpose",
+      "values",
+      "believe",
+      "who are you",
+      "what is revify",
+      "what does revify",
+      "revify private limited",
+    ],
+    body: `## About RevifyEarth (/about)
+Revify Private Limited, trading as RevifyEarth, is an ESG branding and sustainability communication firm.
+
+Positioning: complex ESG information turned into one coherent story — technically robust, visually compelling and strategically aligned.
+
+Mission: to make sustainability performance legible, so the work organisations genuinely do on climate, water, people and governance is understood by the people it needs to reach.
+
+Vision: a reporting cycle that produces a communication platform rather than a document — one narrative that holds together from evidence to executive room to public conversation.
+
+Origin: RevifyEarth began by writing a healthcare enterprise's first sustainability report. Across the cycles that followed the brief widened — from technical review and disclosure enhancement to theme development, report design, print coordination, board support, film and web. That progression is the reason the ecosystem model exists. (Never name the organisation; "a healthcare enterprise" is the only permitted reference.)
+
+Operating belief: sustainability reporting is a strategic communication exercise, not a design assignment. The technical review and the creative work are run by the same team under one narrative, which is what keeps the disclosure defensible and the story readable.`,
+  },
+  {
+    id: "sustainability-branding",
+    keywords: [
+      "branding",
+      "brand",
+      "ecosystem",
+      "narrative",
+      "storytelling",
+      "story",
+      "communication",
+      "identity",
+      "visual language",
+      "design language",
+      "consistent",
+      "consistency",
+      "stakeholder",
+      "audience",
+      "channel",
+      "touchpoint",
+      "campaign",
+      "digital esg",
+      "esg communication",
+    ],
+    body: `## Sustainability branding & the communication ecosystem (/sustainability-branding)
+The premise: a reporting cycle produces one narrative, expressed across five surfaces that all inherit the same theme, typography and data language.
+
+- The report — an editorial document that makes disclosure legible, authoritative and worth spending time with. Everything else in the ecosystem inherits its theme, typography and data language.
+- Print — considered stock, proofing and production choices, so the artefact feels as responsible as its content. This is the version that ends up on the boardroom table.
+- Board presentation — the reporting year distilled into a decision-maker format, built in the approved report identity so leadership sees one consistent story.
+- Video report — a 5-7 minute visual narrative with script, storyboard, motion graphics and animated KPIs, for the audiences who will never open the document.
+- Webpage — a responsive digital home for the sustainability overview, thematic content, film and downloadable access, discoverable long after launch week.
+
+Why it matters commercially: different stakeholders enter through different surfaces. Investors and regulators read the disclosure; boards want the decision view; employees, customers and communities are far more likely to watch or browse than to read 120 pages. One narrative rendered five ways reaches all of them without contradicting itself — which is the failure mode when report, deck, film and site are commissioned separately.
+
+Digital ESG strategy: the webpage extends the reporting year past publication week. It gives sustainability content a discoverable, linkable home, keeps the report accessible for download, and carries the film and thematic highlights for audiences who will never open a PDF.`,
+  },
+  {
+    id: "faqs",
+    keywords: [
+      "faq",
+      "question",
+      "common",
+      "how many",
+      "iterations",
+      "revisions",
+      "part of",
+      "only part",
+      "modular",
+      "need from us",
+      "printed",
+      "how does it work",
+      "what happens",
+    ],
+    body: `## Published FAQs (/resources#faqs) — answer these consistently with the site
+- What does an integrated engagement cover? Content review and gap assessment, report theme development and design, sustainable print production, board presentation support, a Full HD video report, and a responsive sustainability webpage — under one narrative architecture with project management across all workstreams.
+- How long does a reporting cycle take? Five phases from kick-off to results presentation. Data collection timeframes vary; the plan assumes UP TO SIX WEEKS for data collection, and delivery depends on timely receipt of inputs, consolidated feedback and approvals.
+- Do you collect or assure our ESG data? No. Primary data collection, calculation and independent verification/assurance are out of scope, as are new standalone technical studies not already available as project inputs. RevifyEarth reviews, strengthens and communicates what client teams provide.
+- How many design iterations are included? Five initial creative theme directions and multiple reasonable iterations until final approval, with no fixed cap on report design revisions and no predefined page limit.
+- Which frameworks do you work across? GRI Standards (Universal and Topic), BRSR and the UN SDGs — reviewed for accuracy, relevance and meaningful integration rather than bolt-on compliance references.
+- Can we commission only part of the ecosystem? Yes. Engagements are scoped to the brief. Each workstream stands on its own while staying consistent with the others, so a client can begin with review and design and extend into film and web in a later cycle.
+- What do you need from us? A compiled report draft or the underlying content, access to data owners for clarification, timely consolidated feedback at each review stage, and approvals at the agreed decision points.
+- Is the printed report included? Printing and delivery of the agreed number of copies is included, on FSC-certified and/or recycled stock between 75 and 130 GSM with perfect binding. Quantities beyond the agreed number are a separate scope item.`,
+  },
+  {
+    id: "site-guide",
+    keywords: [
+      "page",
+      "website",
+      "site",
+      "where",
+      "find",
+      "read more",
+      "link",
+      "navigate",
+      "section",
+      "more information",
+      "learn more",
+    ],
+    body: `## Site map — where to send a visitor
+- / — home: positioning, the ecosystem overview and the video-report approach.
+- /about — mission, vision, origin and how RevifyEarth works.
+- /services — all seven services, each expandable; /services/<slug> for the deep dive.
+- /expertise — ESG expertise and the frameworks strip (GRI, BRSR, UN SDGs); /expertise#frameworks anchors to it.
+- /sustainability-branding — the ESG branding ecosystem and how the five surfaces relate.
+- /industries — the six target sectors and their disclosure profiles.
+- /process — the five delivery phases and milestones.
+- /team — founding team and core designing team.
+- /projects — engagement approach. Published case studies are not yet available.
+- /resources — FAQs (/resources#faqs) and reference material.
+- /contact — enquiry form and direct contacts.
+
+Service slugs: content-review, report-design, print-production, board-presentation, video-report, webpage-development, integrated-communication.
+
+Cite paths inline as plain text (for example "/services/report-design"), and only when the page genuinely answers the question asked.`,
+  },
+  {
+    id: "esg-general-advisory",
+    keywords: [
+      "carbon accounting",
+      "ghg protocol",
+      "net zero",
+      "net-zero",
+      "decarbonisation",
+      "decarbonization",
+      "science based",
+      "sbti",
+      "climate risk",
+      "physical risk",
+      "transition risk",
+      "assurance",
+      "limited assurance",
+      "reasonable assurance",
+      "double materiality",
+      "materiality assessment",
+      "stakeholder engagement",
+      "esg rating",
+      "cdp",
+      "sasb",
+      "integrated report",
+      "value chain",
+    ],
+    body: `## General ESG advisory context (professional knowledge, NOT a RevifyEarth deliverable)
+You may explain these as a senior ESG practitioner would, to help a visitor think clearly. Always keep the line visible between general professional context and what RevifyEarth actually delivers, and never let general knowledge imply a capability RevifyEarth has not claimed.
+
+- Materiality: single materiality asks which sustainability topics affect the business; double materiality (the CSRD/ESRS framing) also asks where the business affects people and environment. GRI 3 sets out the impact-materiality process.
+- Emissions scopes (GHG Protocol): Scope 1 direct from owned or controlled sources; Scope 2 purchased energy (location-based and market-based); Scope 3 the fifteen value-chain categories, usually the largest and hardest to evidence.
+- Carbon accounting and net-zero targets: RevifyEarth does NOT calculate, model or verify emissions. It communicates and stress-tests the narrative around figures the client's own teams or advisers have produced. Say this explicitly whenever a visitor appears to be asking for measurement work.
+- Assurance: limited and reasonable assurance are engagements for an independent assurance provider. RevifyEarth is not an assurance provider and does not audit, verify or certify reported data. Recommend an appropriate professional adviser.
+- CSRD/ESRS, ISSB (IFRS S1 and S2), TCFD, SASB and CDP: explain them accurately when asked, then be explicit that RevifyEarth's stated review and alignment scope covers GRI, BRSR and the UN SDGs, and that anything beyond that should be confirmed with the team at info@revifyearth.com.
+- Reporting quality: the recurring weaknesses in corporate disclosure are unlabelled boundaries, year-on-year comparability breaks, unit and terminology drift, targets without baselines, and narrative that asserts progress the data does not evidence. Reviewing exactly these is what /services/content-review covers.
+
+Do not give legal, audit, assurance, tax or investment opinions. Point to the appropriate professional instead.`,
+  },
 ];
 
 /**
  * Lightweight keyword retrieval.
  *
- * The full corpus is small enough to send wholesale, but trimming it keeps prompts
- * cheaper and sharpens the model's focus. Scoring is intentionally simple — exact
- * phrase containment on a normalised query. Anything that scores zero is dropped,
- * and if nothing matches we fall back to the highest-level documents so the model is
+ * The corpus is small enough to send wholesale, but trimming it keeps prompts
+ * cheaper and sharpens the model's focus. Anything that scores zero is dropped, and
+ * if nothing matches we fall back to the highest-level documents so the model is
  * never left without grounding.
+ *
+ * Short keywords are matched on word boundaries rather than by substring. Plain
+ * containment made "why" fire on "anywhere", "who" on "whole" and "cover" on
+ * "discover", which pulled the wrong documents into context on perfectly ordinary
+ * questions. Multi-word keywords stay substring matches so phrases like "how long"
+ * still hit.
  */
+const SHORT_KEYWORD_LENGTH = 6;
+const wordBoundaryCache = new Map<string, RegExp>();
+
+function matchesKeyword(haystack: string, keyword: string): boolean {
+  if (keyword.length > SHORT_KEYWORD_LENGTH || keyword.includes(" ")) {
+    return haystack.includes(keyword);
+  }
+  let pattern = wordBoundaryCache.get(keyword);
+  if (!pattern) {
+    // Keywords are authored literals in this module, but escaping keeps a future
+    // one with punctuation from silently becoming a different expression.
+    pattern = new RegExp(`\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, "i");
+    wordBoundaryCache.set(keyword, pattern);
+  }
+  return pattern.test(haystack);
+}
+
 export function selectKnowledge(query: string, limit = 5): readonly KnowledgeDoc[] {
   const normalised = query.toLowerCase();
 
   const scored = knowledgeDocs
     .map((doc) => {
       const score = doc.keywords.reduce(
-        (total, keyword) => (normalised.includes(keyword) ? total + keyword.length : total),
+        (total, keyword) => (matchesKeyword(normalised, keyword) ? total + keyword.length : total),
         0,
       );
       return { doc, score };

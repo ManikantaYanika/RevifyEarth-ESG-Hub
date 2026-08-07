@@ -22,7 +22,7 @@ export function MethodologyTimeline() {
   const [active, setActive] = useState(0);
 
   return (
-    <section className="mx-auto max-w-[1440px] px-5 py-24 md:px-10 md:py-32">
+    <section className="mx-auto max-w-[1440px] px-5 py-16 sm:py-20 md:px-10 md:py-32">
       <div className="grid gap-12 md:grid-cols-[.7fr_1.3fr]">
         <div>
           <SectionLabel>The sequence</SectionLabel>
@@ -38,7 +38,7 @@ export function MethodologyTimeline() {
             <ul className="mt-4 space-y-2.5">
               {milestones.map((milestone) => (
                 <li key={milestone.key} className="flex items-center gap-3 text-xs text-[#3d5a5f]">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#a8c95a] font-mono-custom text-[10px] text-[#24626b]">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#a8c95a] font-mono-custom text-xs text-[#24626b] lg:text-[10px]">
                     {milestone.key}
                   </span>
                   {milestone.title}
@@ -63,10 +63,10 @@ export function MethodologyTimeline() {
                       className="focus-ring flex w-full items-center gap-4 rounded-sm py-5 text-left"
                       data-testid={`button-phase-${phase.index}`}
                     >
-                      <span className="font-mono-custom text-[10px] text-[#24626b]">{phase.index}</span>
+                      <span className="font-mono-custom text-xs text-[#24626b] lg:text-[10px]">{phase.index}</span>
                       <span className="flex-1 text-sm font-semibold">{phase.title}</span>
                       <span
-                        className={`hidden shrink-0 rounded-full border px-3 py-1 font-mono-custom text-[10px] uppercase tracking-widest sm:block ${ownerTone[phase.owner]}`}
+                        className={`hidden shrink-0 rounded-full border px-3 py-1 font-mono-custom text-[11px] uppercase tracking-widest sm:block lg:text-[10px] ${ownerTone[phase.owner]}`}
                       >
                         {phase.owner}
                       </span>
@@ -80,7 +80,7 @@ export function MethodologyTimeline() {
                         {phase.steps.map((step) => (
                           <li
                             key={step}
-                            className="border border-[#b8c9bd] px-3 py-2 font-mono-custom text-[10px] text-[#24626b]"
+                            className="border border-[#b8c9bd] px-3 py-2 font-mono-custom text-xs text-[#24626b] lg:text-[10px]"
                           >
                             {step}
                           </li>
@@ -106,7 +106,7 @@ export function MethodologyTimeline() {
  */
 export function InclusionsExclusions() {
   return (
-    <section className="bg-[#e7dfd0] px-5 py-24 md:px-10 md:py-32">
+    <section className="bg-[#e7dfd0] px-5 py-16 sm:py-20 md:px-10 md:py-32">
       <div className="mx-auto max-w-[1440px]">
         <SectionLabel>Scope, stated plainly</SectionLabel>
         <div className="grid gap-10 md:grid-cols-[.9fr_1.1fr]">

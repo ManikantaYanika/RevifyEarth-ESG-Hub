@@ -23,7 +23,7 @@ export function About() {
       />
 
       {/* Mission & vision */}
-      <section className="mx-auto grid max-w-[1440px] gap-12 px-5 py-24 md:grid-cols-[.8fr_1.2fr] md:px-10 md:py-36">
+      <section className="mx-auto grid max-w-[1440px] gap-12 px-5 py-16 sm:py-20 md:grid-cols-[.8fr_1.2fr] md:px-10 md:py-36">
         <div>
           <SectionLabel>Why we exist</SectionLabel>
           <h2 className="font-display text-5xl leading-[.95] text-[#24626b] md:text-7xl">
@@ -55,7 +55,7 @@ export function About() {
       </section>
 
       {/* How the engagement matures */}
-      <section className="bg-[#dce5d0] px-5 py-24 md:px-10 md:py-32">
+      <section className="bg-[#dce5d0] px-5 py-16 sm:py-20 md:px-10 md:py-32">
         <div className="mx-auto max-w-[1440px]">
           <SectionLabel>The ESG journey</SectionLabel>
           <div className="grid gap-10 md:grid-cols-[.9fr_1.1fr]">
@@ -73,7 +73,7 @@ export function About() {
           <ol className="mt-16 grid gap-px bg-[#8ba59a] md:grid-cols-3">
             {maturityStages.map((stage, index) => (
               <Reveal as="li" key={stage.stage} order={index} className="bg-[#dce5d0] p-8">
-                <span className="font-mono-custom text-[10px] uppercase tracking-widest text-[#24626b]">
+                <span className="font-mono-custom text-xs uppercase tracking-widest text-[#24626b] lg:text-[10px]">
                   {stage.stage}
                 </span>
                 <h3 className="font-display mt-6 text-3xl leading-tight text-[#24626b]">{stage.title}</h3>
@@ -95,7 +95,7 @@ export function About() {
       <QuoteBand>One coherent story, wherever it lands.</QuoteBand>
 
       {/* Careers */}
-      <section id="careers" className="mx-auto max-w-[1440px] scroll-mt-24 px-5 py-24 md:px-10 md:py-32">
+      <section id="careers" className="mx-auto max-w-[1440px] scroll-mt-24 px-5 py-16 sm:py-20 md:px-10 md:py-32">
         <div className="grid gap-12 md:grid-cols-[.8fr_1.2fr]">
           <div>
             <SectionLabel>Careers</SectionLabel>

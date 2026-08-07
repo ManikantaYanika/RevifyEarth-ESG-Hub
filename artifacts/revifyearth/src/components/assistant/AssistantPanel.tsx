@@ -24,6 +24,9 @@ const SUGGESTIONS = [
   'What is included in the video report?',
 ] as const;
 
+/** Opening prompts sit two-up on wider phones; five stacked pushes the composer off-screen. */
+const SUGGESTION_GRID = 'grid grid-cols-1 gap-2 min-[400px]:grid-cols-2 sm:grid-cols-1';
+
 const FOCUSABLE =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
@@ -139,6 +142,15 @@ export default function AssistantPanel({ onClose }: { onClose: () => void }) {
     [submit],
   );
 
+  const askFollowUp = useCallback(
+    (question: string) => {
+      if (busy) return;
+      followRef.current = true;
+      send(question);
+    },
+    [busy, send],
+  );
+
   const lastReplyIndex = entries.reduce(
     (found, entry, index) => (entry.role === 'assistant' ? index : found),
     -1,
@@ -202,7 +214,7 @@ export default function AssistantPanel({ onClose }: { onClose: () => void }) {
       >
         {empty && (
           <div className="space-y-5">
-            <p className="text-xs leading-6 text-white/70">
+            <p className="text-[13px] leading-6 text-white/70 sm:text-xs">
               Ask about sustainability reporting, GRI and BRSR alignment, or how a RevifyEarth
               engagement works. Answers cover our services and general ESG practice — not legal or
               assurance advice.
@@ -210,16 +222,13 @@ export default function AssistantPanel({ onClose }: { onClose: () => void }) {
 
             <div>
               <p className="eyebrow mb-2.5 text-white/40">Suggested</p>
-              <div className="space-y-2">
+              <div className={SUGGESTION_GRID}>
                 {SUGGESTIONS.map((prompt) => (
                   <button
                     type="button"
                     key={prompt}
-                    onClick={() => {
-                      followRef.current = true;
-                      send(prompt);
-                    }}
-                    className="focus-ring block w-full rounded-sm border border-white/15 px-3 py-3 text-left text-[11px] leading-5 text-white/85 transition-colors hover:border-[#a8c95a] hover:bg-white/[0.03]"
+                    onClick={() => askFollowUp(prompt)}
+                    className="focus-ring flex min-h-11 w-full items-center rounded-sm border border-white/15 px-3 py-3 text-left text-[12.5px] leading-5 text-white/85 transition-colors hover:border-[#a8c95a] hover:bg-white/3 sm:text-[11px]"
                   >
                     {prompt}
                   </button>
@@ -235,9 +244,12 @@ export default function AssistantPanel({ onClose }: { onClose: () => void }) {
           <Message
             key={entry.id}
             entry={entry}
-            isLastReply={index === lastReplyIndex && !busy}
+            isLastEntry={index === entries.length - 1 && !busy}
             busy={busy}
+            streaming={phase === 'streaming' && index === entries.length - 1}
+            errored={Boolean(error)}
             onRegenerate={regenerate}
+            onFollowUp={askFollowUp}
           />
         ))}
 
@@ -263,14 +275,19 @@ export default function AssistantPanel({ onClose }: { onClose: () => void }) {
           >
             <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#e0a184]" aria-hidden="true" />
             <div className="min-w-0 flex-1">
-              <p className="text-[11px] leading-5 text-white/85">{error.message}</p>
-              <button
-                type="button"
-                onClick={retry}
-                className="focus-ring mt-2 rounded-sm text-[10px] font-extrabold uppercase tracking-[.12em] text-[#a8c95a] hover:underline"
-              >
-                Try again
-              </button>
+              <p className="text-[12px] leading-5 text-white/85 sm:text-[11px]">{error.message}</p>
+              {/* `assistant_unavailable` is an operator fault — no key, no credit,
+                  bad key. Retrying cannot clear it, and offering the button invites
+                  a visitor to tap the same question repeatedly for nothing. */}
+              {error.code !== 'assistant_unavailable' && (
+                <button
+                  type="button"
+                  onClick={retry}
+                  className="focus-ring mt-2 min-h-11 rounded-sm text-[10px] font-extrabold uppercase tracking-[.12em] text-[#a8c95a] hover:underline"
+                >
+                  Try again
+                </button>
+              )}
             </div>
           </div>
         )}

@@ -23,13 +23,16 @@ export function CtaBand({
   body?: string;
 }) {
   return (
-    <section className="bg-[#a8c95a] px-5 py-20 text-[#142b32] md:px-10 md:py-28">
-      <div className="mx-auto flex max-w-[1440px] flex-col justify-between gap-9 md:flex-row md:items-end">
+    <section className="bg-[#a8c95a] px-5 py-14 sm:py-16 text-[#142b32] md:px-10 md:py-28">
+      {/* Side-by-side from `lg`, not `md`. At 768 the headline and the button pair
+          were sharing one row, leaving the buttons less width than their own labels
+          and pushing the page 3px sideways. */}
+      <div className="mx-auto flex max-w-[1440px] flex-col justify-between gap-9 lg:flex-row lg:items-end">
         <div>
           <h2 className="font-display max-w-3xl text-5xl leading-[.94] md:text-7xl">{title}</h2>
           {body && <p className="mt-6 max-w-md text-sm leading-7 text-[#142b32]/80">{body}</p>}
         </div>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex shrink-0 flex-wrap gap-3">
           <ActionButton href="/contact" variant="dark" icon={<ArrowUpRight className="h-3.5 w-3.5" />} testId="link-cta-consultation">
             Book a consultation
           </ActionButton>
@@ -58,7 +61,7 @@ export function StatsBand() {
   ];
 
   return (
-    <section className="bg-[#142b32] px-5 py-20 text-[#f2f0e8] md:px-10 md:py-24">
+    <section className="bg-[#142b32] px-5 py-14 sm:py-16 text-[#f2f0e8] md:px-10 md:py-24">
       <div className="mx-auto max-w-[1440px]">
         <SectionLabel light>What an engagement commits to</SectionLabel>
         <dl className="grid gap-px border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
@@ -82,7 +85,7 @@ export function FrameworkStrip({ light = false }: { light?: boolean }) {
   return (
     <section
       id="frameworks"
-      className={`scroll-mt-24 px-5 py-20 md:px-10 md:py-28 ${light ? 'bg-[#142b32] text-[#f2f0e8]' : 'bg-[#e5ebdf] text-[#142b32]'}`}
+      className={`scroll-mt-24 px-5 py-14 sm:py-16 md:px-10 md:py-28 ${light ? 'bg-[#142b32] text-[#f2f0e8]' : 'bg-[#e5ebdf] text-[#142b32]'}`}
     >
       <div className="mx-auto max-w-[1440px]">
         <div className="grid gap-10 md:grid-cols-[.8fr_1.2fr]">
@@ -123,7 +126,7 @@ export function FrameworkStrip({ light = false }: { light?: boolean }) {
 /** "One story. Multiple stakeholder touchpoints." — the five-pillar ecosystem. */
 export function EcosystemFlow() {
   return (
-    <section className="bg-[#dce5d0] px-5 py-24 md:px-10 md:py-32">
+    <section className="bg-[#dce5d0] px-5 py-16 sm:py-20 md:px-10 md:py-32">
       <div className="mx-auto max-w-[1440px]">
         <SectionLabel>The ecosystem</SectionLabel>
         <div className="grid gap-10 md:grid-cols-[.9fr_1.1fr]">
@@ -170,7 +173,7 @@ export function EcosystemFlow() {
 /** "Why Revify" — the six value-adds from the proposal. */
 export function WhyRevify() {
   return (
-    <section className="bg-[#24626b] px-5 py-24 text-[#f2f0e8] md:px-10 md:py-32">
+    <section className="bg-[#24626b] px-5 py-16 sm:py-20 text-[#f2f0e8] md:px-10 md:py-32">
       <div className="mx-auto max-w-[1440px]">
         <SectionLabel light>Why RevifyEarth</SectionLabel>
         <div className="grid gap-10 md:grid-cols-[.9fr_1.1fr]">
@@ -190,7 +193,7 @@ export function WhyRevify() {
         <div className="mt-16 grid gap-px bg-white/15 sm:grid-cols-2 lg:grid-cols-3">
           {valueAdds.map((value, index) => (
             <Reveal key={value.index} order={index % 3} className="bg-[#24626b] p-8">
-              <span className="font-mono-custom text-[10px] text-[#a8c95a]">{value.index}</span>
+              <span className="font-mono-custom text-xs text-[#a8c95a] lg:text-[10px]">{value.index}</span>
               <h3 className="mt-6 text-lg font-bold leading-snug">{value.title}</h3>
               <p className="mt-3 text-xs leading-6 text-white/80">{value.body}</p>
             </Reveal>

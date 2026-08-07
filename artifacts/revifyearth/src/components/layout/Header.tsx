@@ -1,4 +1,4 @@
-import { ArrowUpRight, ChevronDown, Menu, X } from 'lucide-react';
+import { ArrowUpRight, ChevronDown } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'wouter';
 
@@ -16,10 +16,21 @@ import { MobileNav } from './MobileNav';
 export function Header() {
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [location, navigate] = useLocation();
   const headerRef = useRef<HTMLElement>(null);
   const closeTimer = useRef<number | undefined>(undefined);
   const canHover = useRef(false);
+
+  // Elevation once the page has moved, so the bar separates from the hero without
+  // changing height — a sticky header that resizes on scroll reflows the document
+  // underneath it.
+  useEffect(() => {
+    const update = () => setScrolled(window.scrollY > 8);
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    return () => window.removeEventListener('scroll', update);
+  }, []);
 
   // On a hover-capable pointer the panel opens on hover, so activating the trigger
   // means "take me to the overview". Without hover (touch), activation is the only
@@ -58,11 +69,16 @@ export function Header() {
   return (
     <header
       ref={headerRef}
-      className="sticky top-0 z-40 border-b border-white/10 bg-[#142b32]/95 text-[#f2f0e8] backdrop-blur-xl"
+      className={`sticky top-0 z-40 border-b text-[#f2f0e8] backdrop-blur-xl transition-[background-color,border-color,box-shadow] duration-300 ${
+        scrolled
+          ? 'border-white/10 bg-[#142b32]/98 shadow-[0_10px_30px_-18px_rgba(0,0,0,.9)]'
+          : 'border-white/[.07] bg-[#142b32]/95'
+      }`}
       onMouseLeave={scheduleClose}
       onMouseEnter={cancelClose}
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
-      <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-6 px-5 py-4 md:px-10">
+      <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-5 py-4 sm:gap-6 md:px-10">
         <Logo light />
 
         <nav aria-label="Primary" className="hidden lg:block">
@@ -106,7 +122,7 @@ export function Header() {
 
         <Link
           href="/contact"
-          className="focus-ring hidden items-center gap-2 rounded-full bg-[#a8c95a] px-5 py-3 text-[10px] font-extrabold uppercase tracking-[.14em] text-[#142b32] transition-transform hover:-translate-y-0.5 md:flex"
+          className="focus-ring hidden items-center gap-2 min-h-11 rounded-full bg-[#a8c95a] px-5 py-3 text-[11px] font-extrabold uppercase tracking-[.14em] text-[#142b32] transition-transform hover:-translate-y-0.5 md:flex lg:text-[10px]"
           data-testid="link-header-cta"
         >
           Book a consultation <ArrowUpRight className="h-3.5 w-3.5" />
@@ -118,10 +134,18 @@ export function Header() {
           aria-expanded={mobileOpen}
           aria-controls="mobile-nav"
           onClick={() => setMobileOpen((v) => !v)}
-          className="focus-ring rounded-full border border-white/20 p-2 lg:hidden"
+          // 44px minimum: p-2 around a 20px icon gave a 38px target, under the
+          // 44px comfortable-touch guidance the rest of the mobile UI now meets.
+          className="focus-ring flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/20 transition-colors hover:border-[#a8c95a] hover:text-[#a8c95a] lg:hidden"
           data-testid="button-mobile-menu"
         >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {/* Bars morph into a cross; `aria-expanded` on the button drives the CSS,
+              so the visual state cannot drift from the announced state. */}
+          <span className="burger" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </span>
         </button>
       </div>
 
@@ -143,7 +167,7 @@ export function Header() {
                 <p className="mt-4 max-w-xs text-sm leading-7 text-white/70">{group.intro}</p>
                 <Link
                   href={group.href}
-                  className="focus-ring mt-6 inline-flex items-center gap-2 rounded-sm border-b border-[#a8c95a] pb-1 text-[10px] font-bold uppercase tracking-[.16em] text-[#f2f0e8]"
+                  className="focus-ring mt-6 inline-flex min-h-11 items-center gap-2 rounded-sm border-b border-[#a8c95a] pb-1 text-[10px] font-bold uppercase tracking-[.16em] text-[#f2f0e8]"
                 >
                   Overview <ArrowUpRight className="h-3.5 w-3.5" />
                 </Link>

@@ -2,6 +2,7 @@ import { MessageCircle, X } from 'lucide-react';
 import { Suspense, lazy, useEffect, useState } from 'react';
 
 import { fetchAssistantStatus } from '@/lib/assistant-client';
+import { useBodyScrollLock } from '@/hooks/use-body-scroll-lock';
 
 /**
  * Assistant launcher.
@@ -46,18 +47,18 @@ export function Assistant() {
   }, []);
 
   // Body scroll lock while the mobile sheet covers the page. Desktop keeps the page
-  // scrollable behind the floating card, so this only applies below `sm`.
+  // scrollable behind the floating card, so this only applies below `sm`. Tracked as
+  // state rather than read once, so rotating a phone into landscape releases it.
+  const [isSheet, setIsSheet] = useState(false);
   useEffect(() => {
-    if (!open) return;
-    const isSheet = window.matchMedia('(max-width: 639px)').matches;
-    if (!isSheet) return;
+    const query = window.matchMedia('(max-width: 639px)');
+    const update = () => setIsSheet(query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
 
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = previous;
-    };
-  }, [open]);
+  useBodyScrollLock(open && isSheet);
 
   if (available === false) return null;
 
@@ -74,18 +75,21 @@ export function Assistant() {
         onClick={() => setOpen((current) => !current)}
         aria-expanded={open}
         aria-label={open ? 'Close the RevifyEarth assistant' : 'Open the RevifyEarth assistant'}
+        // A circular button below `sm` and a labelled pill from `sm` up. The pill is
+        // ~150px wide, and on a phone it sat over the right-hand end of body text
+        // for the whole length of the page; a 56px circle clears the measure.
         // Hidden behind the mobile sheet, which has its own close control.
-        className={`focus-ring fixed bottom-5 right-5 z-[60] flex min-h-[44px] items-center gap-2.5 rounded-full bg-[#a8c95a] px-4 py-3 text-[10px] font-extrabold uppercase tracking-widest text-[#142b32] shadow-lg transition-transform hover:-translate-y-1 md:bottom-7 md:right-7 ${
+        className={`focus-ring fixed bottom-5 right-5 z-[60] h-14 w-14 items-center justify-center gap-2.5 rounded-full bg-[#a8c95a] text-[11px] font-extrabold uppercase tracking-widest text-[#142b32] shadow-lg transition-transform hover:-translate-y-1 sm:h-auto sm:w-auto sm:min-h-11 sm:justify-start sm:px-4 sm:py-3 md:bottom-7 md:right-7 lg:text-[10px] ${
           open ? 'hidden sm:flex' : 'flex'
         }`}
         style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
       >
         {open ? (
-          <X className="h-4 w-4" aria-hidden="true" />
+          <X className="h-5 w-5 sm:h-4 sm:w-4" aria-hidden="true" />
         ) : (
-          <MessageCircle className="h-4 w-4" aria-hidden="true" />
+          <MessageCircle className="h-5 w-5 sm:h-4 sm:w-4" aria-hidden="true" />
         )}
-        {open ? 'Close' : 'Ask Revify'}
+        <span className="hidden sm:inline">{open ? 'Close' : 'Ask Revify'}</span>
       </button>
     </>
   );

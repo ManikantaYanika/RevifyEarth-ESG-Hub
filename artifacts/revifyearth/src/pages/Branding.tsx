@@ -90,7 +90,7 @@ export function Branding() {
         image={media.mountainSunset}
       />
 
-      <section className="mx-auto max-w-[1440px] px-5 py-24 md:px-10 md:py-32">
+      <section className="mx-auto max-w-[1440px] px-5 py-16 sm:py-20 md:px-10 md:py-32">
         <SectionLabel>The connected system</SectionLabel>
 
         <div role="tablist" aria-label="Communication formats" className="flex flex-wrap gap-2 border-b border-[#b8c9bd] pb-5">
@@ -105,7 +105,7 @@ export function Branding() {
                 aria-selected={selected}
                 aria-controls={`panel-${format.key}`}
                 onClick={() => setActive(format.key)}
-                className={`focus-ring rounded-full border px-5 py-3 text-[10px] font-bold uppercase tracking-widest transition-colors ${
+                className={`focus-ring min-h-11 rounded-full border px-5 py-3 text-[11px] font-bold uppercase tracking-widest lg:text-[10px] transition-colors ${
                   selected
                     ? 'border-[#142b32] bg-[#142b32] text-[#f2f0e8]'
                     : 'border-[#b8c9bd] text-[#24626b] hover:border-[#24626b]'

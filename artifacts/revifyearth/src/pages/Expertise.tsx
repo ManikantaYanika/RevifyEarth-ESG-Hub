@@ -46,7 +46,7 @@ export function Expertise() {
       <FrameworkStrip />
 
       {/* What technical review covers */}
-      <section className="mx-auto max-w-[1440px] px-5 py-24 md:px-10 md:py-32">
+      <section className="mx-auto max-w-[1440px] px-5 py-16 sm:py-20 md:px-10 md:py-32">
         <SectionLabel>What a technical review covers</SectionLabel>
         <div className="grid gap-10 md:grid-cols-[.9fr_1.1fr]">
           <h2 className="font-display max-w-md text-5xl leading-[.98] text-[#24626b] md:text-7xl">
@@ -74,7 +74,7 @@ export function Expertise() {
 
       {/* Splits at `lg`, not `md`: a 320px column cannot hold a single line of
           7xl display type, which is what pushed this page 27px wide on tablets. */}
-      <section className="mx-auto grid max-w-[1440px] gap-12 px-5 py-24 md:px-10 md:py-32 lg:grid-cols-2">
+      <section className="mx-auto grid max-w-[1440px] gap-12 px-5 py-16 sm:py-20 md:px-10 md:py-32 lg:grid-cols-2">
         <ResponsiveImage
           asset={media.forestMist}
           sizes="(max-width: 1024px) 100vw, 50vw"

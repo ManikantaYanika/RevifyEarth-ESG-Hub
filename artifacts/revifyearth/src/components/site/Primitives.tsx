@@ -7,7 +7,9 @@ import { brandMark } from '@/data/media';
 /** The official RevifyEarth mark, used exactly as supplied. */
 export function Logo({ light = false }: { light?: boolean }) {
   return (
-    <Link href="/" className="focus-ring flex items-center gap-3 rounded-sm" data-testid="link-logo">
+    // `min-h-11` gives the home link a 44px target without moving the mark: every
+    // container it sits in centres its row, and the mark is only 36px tall.
+    <Link href="/" className="focus-ring flex min-h-11 items-center gap-3 rounded-sm" data-testid="link-logo">
       <img
         src={brandMark}
         alt="RevifyEarth"
@@ -61,15 +63,21 @@ export function ArrowLink({
   light?: boolean;
 }) {
   return (
+    // Two elements rather than one: the outer link owns a real 44px tap target, the
+    // inner span owns the `line-draw` underline. Putting padding on the link itself
+    // would drag the underline (anchored to the bottom edge) away from the text, and
+    // the transparent `::before` this previously used is not reliably hit-tested.
     <Link
       href={href}
-      className={`focus-ring line-draw group inline-flex items-center gap-3 rounded-sm pb-2 text-[10px] font-bold uppercase tracking-[.17em] ${
+      className={`focus-ring group inline-flex min-h-11 items-center rounded-sm ${
         light ? 'text-[#f2f0e8]' : 'text-[#142b32]'
       }`}
       data-testid={`link-${String(children).toLowerCase().replaceAll(' ', '-')}`}
     >
-      {children}
-      <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+      <span className="line-draw relative inline-flex items-center gap-3 pb-2 text-[11px] font-bold uppercase tracking-[.17em] lg:text-[10px]">
+        {children}
+        <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+      </span>
     </Link>
   );
 }
@@ -106,7 +114,7 @@ export function ActionButton({
   className?: string;
   testId?: string;
 }) {
-  const shared = `focus-ring inline-flex items-center justify-center gap-3 rounded-full px-6 py-4 text-[10px] font-extrabold uppercase tracking-[.14em] transition-all duration-300 hover:-translate-y-0.5 ${actionStyles[variant]} ${className}`;
+  const shared = `focus-ring inline-flex items-center justify-center gap-3 min-h-11 rounded-full px-6 py-4 text-[11px] font-extrabold uppercase tracking-[.14em] lg:text-[10px] transition-all duration-300 hover:-translate-y-0.5 ${actionStyles[variant]} ${className}`;
 
   if (href) {
     const external = href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('tel:');
@@ -146,7 +154,7 @@ export function Atmosphere({ dark = false }: { dark?: boolean }) {
 
 export function QuoteBand({ children }: { children: ReactNode }) {
   return (
-    <section className="bg-[#24626b] px-5 py-20 text-[#f2f0e8] md:px-10 md:py-28">
+    <section className="bg-[#24626b] px-5 py-14 sm:py-16 text-[#f2f0e8] md:px-10 md:py-28">
       <div className="mx-auto max-w-[1040px] text-center">
         <p className="font-display text-4xl leading-[1.05] tracking-[-.035em] md:text-6xl">“{children}”</p>
       </div>
