@@ -47,6 +47,16 @@
   to = "/index.html"
   status = 404
 
+# Build output (hashed JS/CSS chunks and images) must never fall through to the SPA
+# shell. Existing files are served first, so this only matches a name that is not in
+# the current deploy — typically a chunk requested by a tab still running the
+# previous build. Answering 200 with index.html made that a MIME-type failure; a 404
+# is the honest answer, and the app reloads once on it (see src/main.tsx).
+[[redirects]]
+  from = "/assets/*"
+  to = "/index.html"
+  status = 404
+
 # SPA fallback. The site routes client-side with wouter, so a deep link or a refresh
 # on /services/report-design must return index.html rather than 404. Netlify serves
 # real files first, so this only catches paths with no matching asset.

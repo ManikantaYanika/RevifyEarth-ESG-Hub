@@ -12,5 +12,10 @@
 # the HTML shell with a 200 and failing later on JSON.parse.
 /api/*  /index.html  404
 
+# Build output never falls through to the SPA shell. Real files are served first, so
+# this only matches a chunk missing from the current deploy (a tab still running the
+# previous build); a 404 lets the app reload once instead of choking on HTML.
+/assets/*  /index.html  404
+
 # Client-side routing: deep links and refreshes resolve to the SPA shell.
 /*      /index.html  200

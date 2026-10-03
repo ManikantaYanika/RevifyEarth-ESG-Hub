@@ -4,7 +4,6 @@ import { ArrowLink, SectionLabel } from '@/components/site/Primitives';
 import { PageHero } from '@/components/site/PageHero';
 import { Reveal } from '@/components/site/Reveal';
 import { CtaBand } from '@/components/sections/Bands';
-import { PendingTrustSections } from '@/components/sections/Faq';
 
 /**
  * The engagement model, shown honestly.
@@ -12,7 +11,7 @@ import { PendingTrustSections } from '@/components/sections/Faq';
  * The previous page presented three vague cards with a decorative letter standing in
  * for project imagery and a filter with a dead branch. Until client work is cleared
  * for publication, this page explains how an engagement is actually constructed —
- * which is verifiable — and the case-study slots sit in the pending section below.
+ * which is verifiable.
  */
 export function Projects() {
   return (
@@ -66,7 +65,6 @@ export function Projects() {
         </div>
       </section>
 
-      <PendingTrustSections />
       <CtaBand />
     </>
   );

@@ -2,6 +2,7 @@ import { media } from '@/data/media';
 import { SectionLabel } from '@/components/site/Primitives';
 import { PageHero } from '@/components/site/PageHero';
 import { ResponsiveImage } from '@/components/site/ResponsiveImage';
+import { MotionImage } from '@/components/animation/MotionImage';
 import { Reveal } from '@/components/site/Reveal';
 import { CtaBand, FrameworkStrip, WhyRevify } from '@/components/sections/Bands';
 
@@ -75,11 +76,13 @@ export function Expertise() {
       {/* Splits at `lg`, not `md`: a 320px column cannot hold a single line of
           7xl display type, which is what pushed this page 27px wide on tablets. */}
       <section className="mx-auto grid max-w-[1440px] gap-12 px-5 py-16 sm:py-20 md:px-10 md:py-32 lg:grid-cols-2">
-        <ResponsiveImage
-          asset={media.forestMist}
-          sizes="(max-width: 1024px) 100vw, 50vw"
-          className="h-[420px] w-full object-cover"
-        />
+        <MotionImage className="h-[420px] w-full" reveal="right">
+          <ResponsiveImage
+            asset={media.forestMist}
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            className="h-full w-full object-cover"
+          />
+        </MotionImage>
         <div className="flex flex-col justify-center">
           <SectionLabel>The point of view</SectionLabel>
           <h2 className="font-display text-5xl leading-[.96] text-[#24626b] md:text-7xl">

@@ -13,7 +13,7 @@
  *
  * CONTENT INTEGRITY RULES ENCODED HERE:
  *  - The founding client is never named. The proposal is confidential; engagements
- *    are referred to as "a healthcare enterprise".
+ *    are referred to as "an enterprise".
  *  - Commercial terms (fees, payment schedule) are client-specific and are NOT in
  *    this corpus. The assistant cannot quote a price because it does not have one.
  *  - No testimonials, awards, partners, client logos or performance metrics exist in
@@ -36,8 +36,8 @@ export const coreFacts = `# RevifyEarth — company facts
 - Positioning: turning complex ESG information into one coherent story — technically robust, visually compelling and strategically aligned.
 - Mission: to make sustainability performance legible, so the work organisations genuinely do on climate, water, people and governance is understood by the people it needs to reach.
 - Vision: a reporting cycle that produces a communication platform rather than a document.
-- Origin: RevifyEarth began by writing a healthcare enterprise's first sustainability report. Across later cycles the brief widened from technical review and disclosure enhancement to theme development, report design, print coordination, board support, film and web. That progression is why the ecosystem model exists.
-- Email: info@revifyearth.com. Website: https://www.revifyearth.com
+- Origin: RevifyEarth began by writing an enterprise's sustainability report. Across later cycles the brief widened from technical review and disclosure enhancement to theme development, report design, print coordination, board support, film and web. That progression is why the ecosystem model exists.
+- Email: info@revifyearth.com. Website: https://revifyearth.com
 - Contacts: Pallavi Priya (Project Manager / CEO, 9608159460); Anu Ananya (Partnership Manager / CFO, 7978869701).
 
 ## The seven services (site paths in brackets)
@@ -573,7 +573,7 @@ Mission: to make sustainability performance legible, so the work organisations g
 
 Vision: a reporting cycle that produces a communication platform rather than a document — one narrative that holds together from evidence to executive room to public conversation.
 
-Origin: RevifyEarth began by writing a healthcare enterprise's first sustainability report. Across the cycles that followed the brief widened — from technical review and disclosure enhancement to theme development, report design, print coordination, board support, film and web. That progression is the reason the ecosystem model exists. (Never name the organisation; "a healthcare enterprise" is the only permitted reference.)
+Origin: RevifyEarth began by writing an enterprise's sustainability report. Across the cycles that followed the brief widened — from technical review and disclosure enhancement to theme development, report design, print coordination, board support, film and web. That progression is the reason the ecosystem model exists. (Never name the organisation; "an enterprise" is the only permitted reference.)
 
 Operating belief: sustainability reporting is a strategic communication exercise, not a design assignment. The technical review and the creative work are run by the same team under one narrative, which is what keeps the disclosure defensible and the story readable.`,
   },

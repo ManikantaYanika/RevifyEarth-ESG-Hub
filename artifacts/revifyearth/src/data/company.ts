@@ -19,9 +19,9 @@ export const company = {
   vision:
     'A reporting cycle that produces a communication platform rather than a document — one narrative that holds together from evidence to executive room to public conversation.',
   origin:
-    'RevifyEarth began by writing a healthcare enterprise’s first sustainability report. Across the cycles that followed, the brief widened — from technical review and disclosure enhancement to theme development, report design, print coordination, board support, film and web. That progression is the reason the ecosystem model exists.',
+    'RevifyEarth began by writing an enterprise’s sustainability report. Across the cycles that followed, the brief widened — from technical review and disclosure enhancement to theme development, report design, print coordination, board support, film and web. That progression is the reason the ecosystem model exists.',
   email: 'info@revifyearth.com',
-  website: 'https://www.revifyearth.com',
+  website: 'https://revifyearth.com',
   copyright: '© 2026 Revify Private Limited, All rights reserved.',
 } as const;
 

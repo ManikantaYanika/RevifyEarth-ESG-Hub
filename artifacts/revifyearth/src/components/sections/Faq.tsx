@@ -87,6 +87,10 @@ function PendingCard({ section, order }: { section: PendingSection; order: numbe
  * metrics. These render the finished layout with an explicit "awaiting verified
  * content" state rather than fabricated claims about a real company — swap the data
  * in `resources.ts` and the sections fill themselves.
+ *
+ * Not rendered on any page: removed from Home, Projects and Resources at the client's
+ * request (2026-10-03). Kept so verified material can be published without a rebuild
+ * of the layout — re-add `<PendingTrustSections />` where it should appear.
  */
 export function PendingTrustSections() {
   return (
