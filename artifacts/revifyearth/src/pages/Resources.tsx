@@ -4,7 +4,7 @@ import { ArrowLink, SectionLabel } from '@/components/site/Primitives';
 import { PageHero } from '@/components/site/PageHero';
 import { Reveal } from '@/components/site/Reveal';
 import { CtaBand, FrameworkStrip } from '@/components/sections/Bands';
-import { FaqAccordion, PendingTrustSections } from '@/components/sections/Faq';
+import { FaqAccordion } from '@/components/sections/Faq';
 
 export function Resources() {
   return (
@@ -54,7 +54,6 @@ export function Resources() {
       </section>
 
       <FaqAccordion />
-      <PendingTrustSections />
       <CtaBand body="If a question here is not answered, it is probably specific to your reporting cycle — which is exactly the conversation worth having." />
     </>
   );

@@ -89,6 +89,17 @@ export default defineConfig(async ({ command }): Promise<UserConfig> => {
     build: {
       outDir: path.resolve(import.meta.dirname, 'dist/public'),
       emptyOutDir: true,
+      rollupOptions: {
+        output: {
+          // The motion libraries change far less often than the site, so a chunk of
+          // their own keeps its hash — and the visitor's cached copy — across deploys.
+          // Matched by path so the plugin subpaths (gsap/ScrollTrigger, gsap/SplitText)
+          // land in it too, not just the package entry.
+          manualChunks(id) {
+            if (/[\\/]node_modules[\\/](\.pnpm[\\/])?(gsap|@gsap|lenis)/.test(id)) return 'motion';
+          },
+        },
+      },
     },
     server: {
       port,

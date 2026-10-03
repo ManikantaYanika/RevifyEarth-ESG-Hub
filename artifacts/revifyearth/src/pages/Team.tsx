@@ -3,6 +3,7 @@ import { media } from '@/data/media';
 import { SectionLabel } from '@/components/site/Primitives';
 import { PageHero } from '@/components/site/PageHero';
 import { ResponsiveImage } from '@/components/site/ResponsiveImage';
+import { MotionImage } from '@/components/animation/MotionImage';
 import { Reveal } from '@/components/site/Reveal';
 import { CtaBand } from '@/components/sections/Bands';
 
@@ -12,8 +13,9 @@ function MemberGrid({ members, label }: { members: readonly TeamMember[]; label:
       <SectionLabel as="h2">{label}</SectionLabel>
       <ul className="grid gap-x-5 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
         {members.map((member, index) => (
-          <Reveal as="li" key={member.name} order={index % 3} className="group border-t border-[#bbaf9d] pt-5">
-            <div className="relative mb-5 flex h-[290px] items-end justify-center overflow-hidden bg-[#c8d0ca]">
+          <Reveal as="li" key={member.name} order={index % 3} className="fx-card group border-t border-[#bbaf9d] pt-5">
+            {/* No parallax: portraits are anchored to the frame's bottom edge. */}
+            <MotionImage className="mb-5 h-[290px] bg-[#c8d0ca]" parallax={0} hover={false}>
               <div className="absolute inset-0 bg-gradient-to-t from-[#24626b]/25 to-transparent" />
               <ResponsiveImage
                 asset={member.image}
@@ -21,7 +23,7 @@ function MemberGrid({ members, label }: { members: readonly TeamMember[]; label:
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 className="relative h-full w-full object-contain object-bottom transition-transform duration-500 group-hover:scale-[1.04]"
               />
-            </div>
+            </MotionImage>
             <h3 className="text-lg font-extrabold">{member.name}</h3>
             {/* 10px uppercase mono is legible beside a portrait on a desktop grid but
                 not on a phone; raised below `sm` only, leaving the desktop card as drawn. */}

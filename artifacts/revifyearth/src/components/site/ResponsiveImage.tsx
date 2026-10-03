@@ -8,6 +8,8 @@ interface ResponsiveImageProps {
   sizes?: string;
   /** Set on the LCP image only — loads eagerly and asks the browser to prioritise it. */
   priority?: boolean;
+  /** Motion hook for hero entrances (animations/presets/hero.ts). */
+  'data-hero'?: string;
 }
 
 /**
@@ -22,6 +24,7 @@ export function ResponsiveImage({
   alt,
   sizes = '100vw',
   priority = false,
+  'data-hero': dataHero,
 }: ResponsiveImageProps) {
   const widest = asset.widths[asset.widths.length - 1];
   const srcSet = asset.widths.map((w) => `${assetUrl(`${asset.base}-${w}.webp`)} ${w}w`).join(', ');
@@ -38,6 +41,7 @@ export function ResponsiveImage({
       decoding={priority ? 'sync' : 'async'}
       fetchPriority={priority ? 'high' : 'auto'}
       className={className}
+      data-hero={dataHero}
     />
   );
 }

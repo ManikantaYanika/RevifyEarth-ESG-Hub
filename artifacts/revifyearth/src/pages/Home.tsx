@@ -1,7 +1,8 @@
 import { ArrowUpRight, Play } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'wouter';
 
+import { useHeroEntrance } from '@/animations/presets/hero';
 import { company } from '@/data/company';
 import { industries } from '@/data/industries';
 import { media } from '@/data/media';
@@ -10,8 +11,9 @@ import { ActionButton, ArrowLink, Atmosphere, QuoteBand, SectionLabel } from '@/
 import { Modal } from '@/components/site/Modal';
 import { ResponsiveImage } from '@/components/site/ResponsiveImage';
 import { Reveal } from '@/components/site/Reveal';
+import { MotionImage } from '@/components/animation/MotionImage';
+import { TextReveal } from '@/components/animation/TextReveal';
 import { CtaBand, EcosystemFlow, FrameworkStrip, StatsBand, WhyRevify } from '@/components/sections/Bands';
-import { PendingTrustSections } from '@/components/sections/Faq';
 
 function VideoApproachModal({ onClose }: { onClose: () => void }) {
   return (
@@ -51,46 +53,54 @@ function VideoApproachModal({ onClose }: { onClose: () => void }) {
 
 export function Home() {
   const [showVideo, setShowVideo] = useState(false);
+  const heroRef = useRef<HTMLElement>(null);
+  useHeroEntrance(heroRef);
 
   return (
     <>
       {/* Hero */}
-      <section className="relative isolate flex min-h-[640px] items-end overflow-hidden bg-[#142b32] text-[#f2f0e8] md:min-h-[850px]">
+      <section
+        ref={heroRef}
+        className="bg-gradient-deep relative isolate flex min-h-[640px] items-end overflow-hidden text-[#f2f0e8] md:min-h-[850px]"
+      >
         <ResponsiveImage
           asset={media.heroBirds}
           alt=""
           priority
           sizes="100vw"
-          className="absolute inset-0 -z-20 h-full w-full object-cover opacity-55"
+          className="hero-media absolute inset-0 -z-20 h-full w-full object-cover opacity-55"
+          data-hero="media"
         />
         <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#142b32] via-[#142b32]/40 to-transparent" />
         <Atmosphere dark />
-        <div className="mx-auto w-full max-w-[1440px] px-5 pb-16 md:px-10 md:pb-24">
-          <Reveal>
-            <p className="eyebrow mb-7 text-[#d3dfb2]">Sustainability communication / {company.legalName}</p>
-          </Reveal>
-          <Reveal order={1}>
-            <h1 className="font-display max-w-5xl text-[clamp(3rem,9vw,9rem)] leading-[.87] tracking-[-.06em]">
-              Make the work
-              <br />
-              <em>impossible</em>
-              <br />
-              to overlook.
-            </h1>
-          </Reveal>
-          <Reveal order={2}>
-            <div className="mt-10 flex flex-col justify-between gap-8 border-t border-white/25 pt-6 md:flex-row md:items-end">
-              <p className="max-w-md text-sm leading-7 text-white/85">{company.positioning}</p>
-              <div className="flex flex-wrap gap-3">
-                <ActionButton href="/contact" variant="accent" icon={<ArrowUpRight className="h-3.5 w-3.5" />}>
-                  Book a consultation
-                </ActionButton>
-                <ActionButton href="/services" variant="light">
-                  Explore solutions
-                </ActionButton>
-              </div>
+        <div className="mx-auto w-full max-w-[1440px] px-5 pb-16 md:px-10 md:pb-24" data-hero="content">
+          <p className="eyebrow mb-7 text-[#d3dfb2]" data-hero="eyebrow">
+            Sustainability communication / {company.legalName}
+          </p>
+          <h1
+            className="font-display max-w-5xl text-[clamp(3rem,9vw,9rem)] leading-[.87] tracking-[-.06em]"
+            data-hero="title"
+          >
+            Make the work
+            <br />
+            <em>impossible</em>
+            <br />
+            to overlook.
+          </h1>
+          <div className="mt-10 flex flex-col justify-between gap-8 pt-6 md:flex-row md:items-end relative">
+            <span className="absolute inset-x-0 top-0 h-px bg-white/25" data-hero="rule" aria-hidden="true" />
+            <p className="max-w-md text-sm leading-7 text-white/85" data-hero="copy">
+              {company.positioning}
+            </p>
+            <div className="flex flex-wrap gap-3" data-hero="actions">
+              <ActionButton href="/contact" variant="accent" icon={<ArrowUpRight className="h-3.5 w-3.5" />}>
+                Book a consultation
+              </ActionButton>
+              <ActionButton href="/services" variant="light">
+                Explore solutions
+              </ActionButton>
             </div>
-          </Reveal>
+          </div>
         </div>
       </section>
 
@@ -98,18 +108,18 @@ export function Home() {
       <section className="mx-auto grid max-w-[1440px] gap-12 px-5 py-16 sm:py-20 md:grid-cols-[.8fr_1.2fr] md:px-10 md:py-36">
         <div>
           <SectionLabel>The proposition</SectionLabel>
-          <p className="font-display text-4xl leading-[1.05] tracking-[-.035em] text-[#24626b] md:text-6xl">
+          <TextReveal as="p" className="font-display text-4xl leading-[1.05] tracking-[-.035em] text-[#24626b] md:text-6xl">
             One story.
             <br />
             <em>Many ways</em>
             <br />
             to meet it.
-          </p>
+          </TextReveal>
         </div>
         <div className="max-w-2xl md:pt-10">
           <Reveal>
             <p className="text-2xl font-medium leading-[1.35] tracking-[-.025em] md:text-4xl">
-              From writing a healthcare enterprise’s first sustainability report to building complete ESG branding and
+              From writing an enterprise’s sustainability report to building complete ESG branding and
               communication ecosystems.
             </p>
           </Reveal>
@@ -132,13 +142,13 @@ export function Home() {
       <section className="mx-auto max-w-[1440px] px-5 py-16 sm:py-20 md:px-10 md:py-32">
         <SectionLabel>What we do</SectionLabel>
         <div className="grid gap-10 md:grid-cols-[.8fr_1.2fr]">
-          <h2 className="font-display max-w-md text-5xl leading-[.98] md:text-7xl">
+          <TextReveal className="font-display max-w-md text-5xl leading-[.98] md:text-7xl">
             Seven
             <br />
             <em>connected</em>
             <br />
             workstreams.
-          </h2>
+          </TextReveal>
           <div className="max-w-lg md:pt-6">
             <p className="text-sm leading-7 text-[#3d5a5f]">
               Sustainability reporting is a strategic communication exercise — one that builds stakeholder confidence
@@ -156,7 +166,7 @@ export function Home() {
               as="article"
               key={service.slug}
               order={index % 3}
-              className="group bg-[#f2f0e8] p-7 transition-colors hover:bg-[#eef1e6] lg:min-h-[260px]"
+              className="fx-card fx-card-tile group bg-[#f2f0e8] p-7 transition-colors hover:bg-[#eef1e6] lg:min-h-[260px]"
             >
               <Link href={`/services/${service.slug}`} className="focus-ring block rounded-sm">
                 <span className="flex items-center justify-between">
@@ -182,11 +192,11 @@ export function Home() {
         <div className="flex flex-wrap items-end justify-between gap-8">
           <div>
             <SectionLabel>Industries we serve</SectionLabel>
-            <h2 className="font-display max-w-lg text-5xl leading-[.98] text-[#24626b] md:text-7xl">
+            <TextReveal className="font-display max-w-lg text-5xl leading-[.98] text-[#24626b] md:text-7xl">
               Context makes
               <br />
               <em>the difference.</em>
-            </h2>
+            </TextReveal>
           </div>
           <ArrowLink href="/industries">See all sectors</ArrowLink>
         </div>
@@ -194,14 +204,14 @@ export function Home() {
           {industries.slice(0, 3).map((industry, index) => (
             <Reveal as="article" key={industry.id} order={index} className="group border-t border-[#9db5ab] pt-5">
               <Link href={`/industries#${industry.id}`} className="focus-ring block rounded-sm">
-                <span className="relative mb-7 block h-56 overflow-hidden bg-[#24626b]">
+                <MotionImage className="mb-7 block h-56 bg-[#24626b]" reveal="up" hover={false}>
                   <ResponsiveImage
                     asset={industry.image}
                     alt=""
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="h-full w-full object-cover opacity-80 transition-transform duration-700 group-hover:scale-105"
                   />
-                </span>
+                </MotionImage>
                 <h3 className="font-display text-2xl text-[#24626b]">{industry.name}</h3>
                 <p className="mt-3 text-sm leading-7 text-[#3d5a5f]">{industry.lede}</p>
               </Link>
@@ -211,21 +221,23 @@ export function Home() {
       </section>
 
       {/* Video report */}
-      <section className="relative isolate overflow-hidden bg-[#142b32] px-5 py-16 sm:py-20 text-[#f2f0e8] md:px-10 md:py-32">
-        <ResponsiveImage
-          asset={media.mountainSunset}
-          alt=""
-          sizes="100vw"
-          className="absolute inset-0 -z-10 h-full w-full object-cover opacity-20"
-        />
+      <section className="bg-gradient-deep relative isolate overflow-hidden px-5 py-16 sm:py-20 text-[#f2f0e8] md:px-10 md:py-32">
+        <MotionImage className="absolute inset-0 -z-10" reveal={false} parallax={16} hover={false}>
+          <ResponsiveImage
+            asset={media.mountainSunset}
+            alt=""
+            sizes="100vw"
+            className="h-full w-full object-cover opacity-20"
+          />
+        </MotionImage>
         <div className="relative mx-auto grid max-w-[1440px] gap-12 md:grid-cols-[1fr_.8fr] md:items-end">
           <div>
             <SectionLabel light>Go beyond the report</SectionLabel>
-            <h2 className="font-display max-w-3xl text-5xl leading-[.95] md:text-8xl">
+            <TextReveal className="font-display max-w-3xl text-5xl leading-[.95] md:text-8xl">
               Give the work
               <br />
               <em>a wider life.</em>
-            </h2>
+            </TextReveal>
           </div>
           <div>
             <p className="max-w-sm text-sm leading-7 text-white/80">
@@ -244,7 +256,6 @@ export function Home() {
         </div>
       </section>
 
-      <PendingTrustSections />
       <CtaBand body="Tell us where you are in the reporting cycle and we will tell you what the next useful step looks like." />
 
       {showVideo && <VideoApproachModal onClose={() => setShowVideo(false)} />}

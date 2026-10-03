@@ -114,20 +114,26 @@ export function ActionButton({
   className?: string;
   testId?: string;
 }) {
-  const shared = `focus-ring inline-flex items-center justify-center gap-3 min-h-11 rounded-full px-6 py-4 text-[11px] font-extrabold uppercase tracking-[.14em] lg:text-[10px] transition-all duration-300 hover:-translate-y-0.5 ${actionStyles[variant]} ${className}`;
+  // Transitions name their properties rather than `all`: magnetic buttons have their
+  // transform written every frame by InteractionLayer, and a CSS transition on
+  // transform would re-smooth each write into a lag.
+  const shared = `fx-btn ${variant === 'accent' ? 'fx-btn-glow' : ''} focus-ring inline-flex items-center justify-center gap-3 min-h-11 rounded-full px-6 py-4 text-[11px] font-extrabold uppercase tracking-[.14em] lg:text-[10px] transition-[background-color,color,border-color,box-shadow,translate] duration-300 hover:-translate-y-0.5 ${actionStyles[variant]} ${className}`;
+  // Filled buttons lean toward the pointer; outline/light stay still so a row of
+  // buttons does not all move at once.
+  const magnetic = variant === 'accent' || variant === 'dark' ? { 'data-magnetic': '' } : {};
 
   if (href) {
     const external = href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('tel:');
     if (external) {
       return (
-        <a href={href} className={shared} data-testid={testId} {...(href.startsWith('http') ? { target: '_blank', rel: 'noreferrer' } : {})}>
+        <a href={href} className={shared} data-testid={testId} {...magnetic} {...(href.startsWith('http') ? { target: '_blank', rel: 'noreferrer' } : {})}>
           {children}
           {icon}
         </a>
       );
     }
     return (
-      <Link href={href} className={shared} data-testid={testId}>
+      <Link href={href} className={shared} data-testid={testId} {...magnetic}>
         {children}
         {icon}
       </Link>
@@ -135,26 +141,18 @@ export function ActionButton({
   }
 
   return (
-    <button type={type} onClick={onClick} className={shared} data-testid={testId}>
+    <button type={type} onClick={onClick} className={shared} data-testid={testId} {...magnetic}>
       {children}
       {icon}
     </button>
   );
 }
 
-export function Atmosphere({ dark = false }: { dark?: boolean }) {
-  return (
-    <div className="atmosphere" aria-hidden="true">
-      <div className="orb orb-a" />
-      <div className="orb orb-b" />
-      {dark && <div className="absolute inset-0 bg-[#142b32]/25" />}
-    </div>
-  );
-}
+export { Atmosphere } from './Atmosphere';
 
 export function QuoteBand({ children }: { children: ReactNode }) {
   return (
-    <section className="bg-[#24626b] px-5 py-14 sm:py-16 text-[#f2f0e8] md:px-10 md:py-28">
+    <section className="bg-gradient-teal px-5 py-14 sm:py-16 text-[#f2f0e8] md:px-10 md:py-28">
       <div className="mx-auto max-w-[1040px] text-center">
         <p className="font-display text-4xl leading-[1.05] tracking-[-.035em] md:text-6xl">“{children}”</p>
       </div>

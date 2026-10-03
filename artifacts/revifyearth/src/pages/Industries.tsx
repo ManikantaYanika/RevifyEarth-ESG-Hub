@@ -3,6 +3,7 @@ import { media } from '@/data/media';
 import { ArrowLink, QuoteBand, SectionLabel } from '@/components/site/Primitives';
 import { PageHero } from '@/components/site/PageHero';
 import { ResponsiveImage } from '@/components/site/ResponsiveImage';
+import { MotionImage } from '@/components/animation/MotionImage';
 import { Reveal } from '@/components/site/Reveal';
 import { CtaBand } from '@/components/sections/Bands';
 
@@ -35,20 +36,22 @@ export function Industries() {
               as="article"
               key={industry.id}
               order={index % 3}
-              className="scroll-mt-24 bg-[#f2f0e8]"
+              className="fx-card fx-card-tile bg-[#f2f0e8]"
             >
-              <div id={industry.id} className="grid gap-8 p-7 md:grid-cols-[.55fr_1.45fr] md:p-10">
-                <div className="relative h-52 overflow-hidden bg-[#24626b] md:h-full md:min-h-[220px]">
+              <div id={industry.id} className="scroll-mt-24 grid gap-8 p-7 md:grid-cols-[.55fr_1.45fr] md:p-10">
+                <MotionImage
+                  className="h-52 bg-[#24626b] md:h-full md:min-h-[220px]"
+                  overlay={
+                    <span className="absolute bottom-4 left-4 font-mono-custom text-xs text-white">0{index + 1}</span>
+                  }
+                >
                   <ResponsiveImage
                     asset={industry.image}
                     alt=""
                     sizes="(max-width: 768px) 100vw, 30vw"
                     className="h-full w-full object-cover opacity-85"
                   />
-                  <span className="absolute bottom-4 left-4 font-mono-custom text-xs text-white">
-                    0{index + 1}
-                  </span>
-                </div>
+                </MotionImage>
 
                 <div>
                   <h2 className="font-display text-3xl leading-tight text-[#24626b] md:text-4xl">{industry.name}</h2>

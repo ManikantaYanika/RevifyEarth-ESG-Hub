@@ -41,6 +41,8 @@ export const portraits: Record<string, ImageAsset> = {
 };
 
 /** The official RevifyEarth mark, used exactly as supplied. */
-export const brandMark = '/assets/revify/revify-mark-white.png';
+// Transparent copy of the official mark: the supplied PNG carries an opaque black
+// background (no alpha channel), which showed as a black square behind the logo.
+export const brandMark = '/assets/revify/revify-mark-white-transparent.png';
 
 export const assetUrl = (file: string) => `/assets/revify/${file}`;

@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
 
+import { startScroll, stopScroll } from '@/animations/scroll/lenis';
+
 /**
  * Body scroll lock for full-screen overlays.
  *
@@ -34,6 +36,8 @@ function lock() {
   // `scroll-behavior: smooth` is set globally; without suppressing it the restore
   // below animates the page back to where it started, in view, over ~500ms.
   documentElement.style.scrollBehavior = 'auto';
+  // Lenis would otherwise keep consuming wheel input aimed at the page behind.
+  stopScroll();
   body.style.position = 'fixed';
   body.style.top = `${-scrollY}px`;
   body.style.width = '100%';
@@ -42,6 +46,9 @@ function lock() {
   body.style.overflowY = 'scroll';
 
   restore = () => {
+    // First: a stopped Lenis clips the root's overflow, which would swallow the
+    // scrollTo below and drop the visitor at the top of the page.
+    startScroll();
     body.style.position = previous.position;
     body.style.top = previous.top;
     body.style.width = previous.width;
