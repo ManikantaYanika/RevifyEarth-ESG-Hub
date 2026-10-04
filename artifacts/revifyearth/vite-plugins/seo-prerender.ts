@@ -31,7 +31,6 @@ import {
   SITE_ORIGIN,
   indexableRoutes,
   notFoundSeo,
-  organizationJsonLd,
   routeSeo,
   socialImageUrl,
   type PageSeo,
@@ -56,7 +55,7 @@ const OWNED_TAGS: readonly RegExp[] = [
 ];
 
 function headBlock(seo: PageSeo): string {
-  const jsonLd = JSON.stringify(organizationJsonLd).replace(/</g, '\\u003c');
+  const jsonLd = JSON.stringify(seo.structuredData).replace(/</g, '\\u003c');
   const lines = [
     `<title>${escapeHtml(seo.title)}</title>`,
     `<meta name="description" content="${escapeHtml(seo.description)}" />`,
@@ -72,7 +71,7 @@ function headBlock(seo: PageSeo): string {
     `<meta name="twitter:title" content="${escapeHtml(seo.twitterTitle)}" />`,
     `<meta name="twitter:description" content="${escapeHtml(seo.twitterDescription)}" />`,
     `<meta name="twitter:image" content="${escapeHtml(socialImageUrl)}" />`,
-    `<script type="application/ld+json" data-jsonld="organization">${jsonLd}</script>`,
+    `<script type="application/ld+json" data-jsonld="page">${jsonLd}</script>`,
   ].filter((line): line is string => line !== null);
   return `${lines.join('\n    ')}\n    `;
 }
@@ -146,6 +145,32 @@ function assertCoverage(appRoutes: readonly string[]): void {
   if (problems.length) throw new Error(`seo-prerender: route coverage failed:\n  - ${problems.join('\n  - ')}`);
 }
 
+/** Search results show roughly this much before truncating. Past it is a warning, not an error. */
+const TITLE_SOFT_LIMIT = 65;
+const DESCRIPTION_SOFT_LIMIT = 175;
+
+/** Two pages with the same title or description compete for the same query. */
+function assertDistinctMetadata(pages: readonly PageSeo[], warn: (message: string) => void): void {
+  const problems: string[] = [];
+  for (const field of ['title', 'description'] as const) {
+    const seen = new Map<string, string>();
+    for (const page of pages) {
+      const value = page[field].trim().toLowerCase();
+      const other = seen.get(value);
+      if (other) problems.push(`${page.path} repeats the ${field} of ${other}`);
+      else seen.set(value, page.path!);
+    }
+  }
+  if (problems.length) throw new Error(`seo-prerender: duplicate metadata:\n  - ${problems.join('\n  - ')}`);
+
+  for (const page of pages) {
+    if (page.title.length > TITLE_SOFT_LIMIT) warn(`seo-prerender: ${page.path} title is ${page.title.length} chars`);
+    if (page.description.length > DESCRIPTION_SOFT_LIMIT) {
+      warn(`seo-prerender: ${page.path} description is ${page.description.length} chars`);
+    }
+  }
+}
+
 function renderSitemap(pages: readonly PageSeo[]): string {
   const urls = pages.map((page) => `  <url><loc>${escapeHtml(page.canonical!)}</loc></url>`).join('\n');
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
@@ -178,6 +203,7 @@ export function seoPrerender(): Plugin {
 
       const appSource = readFileSync(path.resolve(config.root, 'src/App.tsx'), 'utf8');
       assertCoverage(discoverAppRoutes(appSource));
+      assertDistinctMetadata(routeSeo, (message) => config.logger.warn(message));
 
       const index = bundle['index.html'];
       if (!index || index.type !== 'asset') this.error('seo-prerender: index.html is missing from the bundle.');
@@ -210,12 +236,27 @@ export function seoPrerender(): Plugin {
 
       // Final proof against what is actually on disk.
       const problems: string[] = [];
-      for (const page of routeSeo) {
-        const file = path.join(outDir, routeFileName(page.path!));
-        if (!existsSync(file)) problems.push(`missing ${routeFileName(page.path!)}`);
-        else if (!readFileSync(file, 'utf8').includes(`<link rel="canonical" href="${page.canonical}" />`)) {
-          problems.push(`${routeFileName(page.path!)} lacks canonical ${page.canonical}`);
+      const checkJsonLd = (fileName: string, html: string) => {
+        const block = /<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/.exec(html)?.[1];
+        try {
+          const data = JSON.parse(block ?? '');
+          if (data['@context'] !== 'https://schema.org' || !Array.isArray(data['@graph'])) throw new Error('shape');
+        } catch {
+          problems.push(`${fileName} has missing or invalid JSON-LD`);
         }
+      };
+      for (const page of routeSeo) {
+        const fileName = routeFileName(page.path!);
+        const file = path.join(outDir, fileName);
+        if (!existsSync(file)) {
+          problems.push(`missing ${fileName}`);
+          continue;
+        }
+        const html = readFileSync(file, 'utf8');
+        if (!html.includes(`<link rel="canonical" href="${page.canonical}" />`)) {
+          problems.push(`${fileName} lacks canonical ${page.canonical}`);
+        }
+        checkJsonLd(fileName, html);
         if (page.path !== '/' && !written.includes(`\n${page.path}  /${routeFileName(page.path!)}  200`)) {
           problems.push(`_redirects lacks a rewrite for ${page.path}`);
         }
@@ -223,6 +264,8 @@ export function seoPrerender(): Plugin {
       const notFound = path.join(outDir, NOT_FOUND_FILE);
       if (!existsSync(notFound) || !readFileSync(notFound, 'utf8').includes('content="noindex, nofollow"')) {
         problems.push('404.html missing or not noindex');
+      } else {
+        checkJsonLd(NOT_FOUND_FILE, readFileSync(notFound, 'utf8'));
       }
       const sitemap = readFileSync(path.join(outDir, 'sitemap.xml'), 'utf8');
       if (count(sitemap, /<loc>/g) !== routeSeo.length) problems.push('sitemap.xml URL count differs from routes');

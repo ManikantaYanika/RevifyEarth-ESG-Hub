@@ -1,3 +1,5 @@
+import { Link } from 'wouter';
+
 import { ecosystemPillars } from '@/data/services';
 import { media } from '@/data/media';
 import { ArrowLink, SectionLabel } from '@/components/site/Primitives';
@@ -47,9 +49,12 @@ export function Projects() {
         <ol className="mt-16 grid gap-px bg-[#b8c9bd] md:grid-cols-2 lg:grid-cols-5">
           {ecosystemPillars.map((pillar, index) => (
             <Reveal as="li" key={pillar.index} order={index} className="bg-[#f2f0e8] p-7">
-              <span className="font-mono-custom text-xs text-[#24626b]">{pillar.index}</span>
-              <h3 className="font-display mt-10 text-2xl leading-tight">{pillar.title}</h3>
-              <p className="mt-3 text-xs uppercase tracking-[.14em] text-[#24626b]">{pillar.headline}</p>
+              {/* Same link treatment as the ecosystem strip on Home and Services. */}
+              <Link href={`/services/${pillar.slug}`} className="focus-ring block rounded-sm">
+                <span className="font-mono-custom text-xs text-[#24626b]">{pillar.index}</span>
+                <h3 className="font-display mt-10 text-2xl leading-tight">{pillar.title}</h3>
+                <p className="mt-3 text-xs uppercase tracking-[.14em] text-[#24626b]">{pillar.headline}</p>
+              </Link>
             </Reveal>
           ))}
         </ol>

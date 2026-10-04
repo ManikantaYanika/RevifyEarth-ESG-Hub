@@ -19,7 +19,7 @@ function MemberGrid({ members, label }: { members: readonly TeamMember[]; label:
               <div className="absolute inset-0 bg-gradient-to-t from-[#24626b]/25 to-transparent" />
               <ResponsiveImage
                 asset={member.image}
-                alt={member.name}
+                alt={`Portrait of ${member.name}`}
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 className="relative h-full w-full object-contain object-bottom transition-transform duration-500 group-hover:scale-[1.04]"
               />
@@ -42,7 +42,7 @@ export function Team() {
   return (
     <>
       <PageHero
-        eyebrow="The people"
+        eyebrow="The RevifyEarth team"
         title={
           <>
             A partner at

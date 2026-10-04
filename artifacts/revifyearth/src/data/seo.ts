@@ -1,74 +1,133 @@
 import { company } from './company';
-import { services } from './services';
+import { serviceBySlug, services, type Service } from './services';
 
 export interface PageMetaEntry {
   readonly title: string;
   readonly description: string;
 }
 
+/*
+ * Search intent by route (Phase C keyword map). Each page owns one primary topic so
+ * pages do not compete with each other:
+ *   /                          brand + ESG reporting & sustainability communication (India)
+ *   /about                     the company: who RevifyEarth is
+ *   /services                  the service catalogue as a whole
+ *   /services/<slug>           one service each (see serviceMeta below)
+ *   /expertise                 framework knowledge: GRI, BRSR, UN SDGs
+ *   /sustainability-branding   one visual identity across formats
+ *   /industries                sector-specific disclosure context
+ *   /process                   delivery phases and timeline
+ *   /team                      the people
+ *   /projects                  how an engagement is assembled (no case studies yet)
+ *   /resources                 FAQs and reference material
+ *   /contact                   start an enquiry
+ * Titles and descriptions must stay unique; the build fails on a duplicate.
+ */
 const base: Record<string, PageMetaEntry> = {
   '/': {
-    title: 'RevifyEarth — ESG Branding & Sustainability Communication',
+    title: 'RevifyEarth — ESG Reporting & Sustainability Communication',
     description:
-      'RevifyEarth turns complex ESG information into technically robust, visually compelling and strategically aligned communication across report, print, board, film and web.',
+      'RevifyEarth helps organisations in India turn ESG information into clear, credible communication: GRI- and BRSR-aligned report review, report design, print, video and web.',
   },
   '/about': {
-    title: 'About RevifyEarth — ESG Communication Partner',
+    title: 'About RevifyEarth — ESG & Sustainability Communication Partner',
     description:
-      'Revify Private Limited connects technical ESG understanding with strategic storytelling and premium creative design under one integrated engagement model.',
+      'Revify Private Limited is an India-focused ESG and sustainability communication partner, bringing technical reporting expertise, strategic storytelling and design together.',
   },
   '/services': {
-    title: 'ESG Communication Services — RevifyEarth',
+    title: 'ESG & Sustainability Reporting Services — RevifyEarth',
     description:
-      'Content review and gap assessment, sustainability report design, sustainable print, board presentations, video reports, ESG websites and integrated communication.',
+      'Seven connected services: sustainability report review and gap assessment, report design, sustainable print, board presentations, video reports and report webpages.',
   },
   '/expertise': {
-    title: 'ESG Expertise & Frameworks — RevifyEarth',
+    title: 'ESG Reporting Expertise: GRI, BRSR & UN SDGs — RevifyEarth',
     description:
-      'Sustainability reporting expertise across GRI Universal and Topic Standards, BRSR and the UN Sustainable Development Goals.',
+      'The technical side of our work: disclosure completeness against GRI Standards, BRSR alignment, data integrity, climate disclosures and narrative coherence in ESG reports.',
   },
   '/sustainability-branding': {
-    title: 'Sustainability Branding & Communication — RevifyEarth',
+    title: 'Sustainability Branding & Visual Identity — RevifyEarth',
     description:
-      'One sustainability identity across report, print, board presentation, video and web. One story, multiple stakeholder touchpoints.',
+      'One sustainability identity carried across report, print, board presentation, video and web, so every format tells the same ESG story to a different audience.',
   },
   '/industries': {
-    title: 'Industries We Serve — RevifyEarth',
+    title: 'Industry-Specific ESG Reporting & Communication — RevifyEarth',
     description:
-      'ESG communication for healthcare, manufacturing, BFSI, energy, IT and infrastructure — grounded in each sector’s disclosure profile.',
+      'ESG reporting and communication shaped by each sector’s disclosure profile under GRI and BRSR: healthcare, manufacturing, BFSI, energy, IT services and infrastructure.',
   },
   '/process': {
-    title: 'Our Process & Methodology — RevifyEarth',
+    title: 'Our ESG Reporting Process & Timeline — RevifyEarth',
     description:
-      'Five phases from kick-off and scope confirmation through review, design, film and web to the final results presentation.',
+      'How a sustainability reporting engagement runs: five phases from kick-off and scope confirmation through review, report design, video and web to the results presentation.',
   },
   '/team': {
     title: 'The RevifyEarth Team — ESG & Sustainability Experts',
     description:
-      'A founding team of ESG industry experts and a core designing team bringing reporting expertise and creative execution together.',
+      'Meet the founding team of ESG industry experts and the core design team behind RevifyEarth’s sustainability reports, presentations, films and webpages.',
   },
   '/projects': {
-    title: 'Work & Engagement Model — RevifyEarth',
+    title: 'How an ESG Communication Engagement Works — RevifyEarth',
     description:
-      'How an integrated sustainability branding and communication engagement comes together, from evidence to executive room to public conversation.',
+      'How a sustainability communication engagement is built: content review, report design, sustainable print, video report and webpage, sequenced around the reporting cycle.',
   },
   '/resources': {
-    title: 'Resources, Insights & FAQs — RevifyEarth',
+    title: 'ESG Reporting Resources & FAQs — RevifyEarth',
     description:
-      'Frameworks, frequently asked questions on scope and timelines, and perspectives on disclosure quality and reporting practice.',
+      'Answers on scope, timelines and frameworks for teams preparing a sustainability report, with perspectives on GRI and BRSR disclosure quality and reporting practice.',
   },
   '/contact': {
-    title: 'Contact RevifyEarth — Start a Conversation',
+    title: 'Contact RevifyEarth — Discuss Your Sustainability Report',
     description:
-      'Talk to RevifyEarth about your sustainability report, ESG communication system, video report or next strategic direction.',
+      'Talk to RevifyEarth about your sustainability report, BRSR or GRI disclosures, ESG communication, video report or report webpage. Engagements are scoped to the brief.',
+  },
+};
+
+/**
+ * One entry per service slug. Written for search rather than reusing the card
+ * summary, which was written to sit under a visible title and repeats nothing of it.
+ */
+const serviceMeta: Record<string, PageMetaEntry> = {
+  'content-review': {
+    title: 'Sustainability Report Review & Gap Assessment — RevifyEarth',
+    description:
+      'Chapter-by-chapter review of your draft sustainability report against GRI Standards, BRSR and the UN SDGs, resolving disclosure gaps and inconsistencies before design.',
+  },
+  'report-design': {
+    title: 'ESG & Sustainability Report Design — RevifyEarth',
+    description:
+      'Editorial design for ESG and sustainability reports: five creative theme directions, custom infographics and data visualisation, interactive PDF and print-ready artwork.',
+  },
+  'print-production': {
+    title: 'Sustainable Report Print Production — RevifyEarth',
+    description:
+      'Print production for sustainability reports on FSC-certified or recycled paper, with stock and GSM selection, perfect binding, proof review and quality checks before dispatch.',
+  },
+  'board-presentation': {
+    title: 'ESG Board Presentation Support — RevifyEarth',
+    description:
+      'An executive board presentation built from your final sustainability report: reporting-year highlights, key ESG indicators and forward-looking priorities.',
+  },
+  'video-report': {
+    title: 'Sustainability Video Report Production — RevifyEarth',
+    description:
+      'A 5–7 minute sustainability video report with script, storyboard, motion graphics and animated ESG KPIs in Full HD, plus two 30-second cutdowns for social channels.',
+  },
+  'webpage-development': {
+    title: 'Sustainability Report Webpage Development — RevifyEarth',
+    description:
+      'A responsive webpage for your sustainability report, with an overview, key ESG highlights, thematic content, embedded video and downloadable report access.',
+  },
+  'integrated-communication': {
+    title: 'Integrated ESG Communication — RevifyEarth',
+    description:
+      'One sustainability narrative across report review, design, print, board presentation, video and web, planned and managed as a single ESG communication engagement.',
   },
 };
 
 for (const service of services) {
-  base[`/services/${service.slug}`] = {
-    title: `${service.title} — RevifyEarth`,
-    description: service.summary,
-  };
+  const entry = serviceMeta[service.slug];
+  // Thrown at import, so a new service cannot ship with the homepage's metadata.
+  if (!entry) throw new Error(`src/data/seo.ts: no serviceMeta entry for service "${service.slug}".`);
+  base[`/services/${service.slug}`] = entry;
 }
 
 export const pageMeta = base;
@@ -110,10 +169,81 @@ export interface PageSeo {
   readonly ogUrl: string | null;
   readonly twitterTitle: string;
   readonly twitterDescription: string;
+  /** JSON-LD for this page: one @graph, emitted as a single script tag. */
+  readonly structuredData: StructuredData;
 }
 
 /** https://revifyearth.com/ for the root, otherwise no trailing slash. */
 export const canonicalUrl = (path: string): string => `${SITE_ORIGIN}${path === '/' ? '/' : path}`;
+
+/* ---------------------------------------------------------------------------------
+ * Structured data. Only entities the page genuinely is or describes: the company on
+ * every page, the website on the homepage, and a Service on each service page. No
+ * reviews, ratings, FAQ or breadcrumb markup — the site shows no ratings, FAQ rich
+ * results are not offered for this kind of site, and there is no visible breadcrumb
+ * for BreadcrumbList to mirror.
+ * ------------------------------------------------------------------------------- */
+
+export type StructuredData = Readonly<Record<string, unknown>>;
+
+const ORGANIZATION_ID = `${SITE_ORIGIN}/#organization`;
+const WEBSITE_ID = `${SITE_ORIGIN}/#website`;
+
+const india = { '@type': 'Country', name: 'India' } as const;
+
+/** The company. Facts only from src/data/company.ts. */
+const organizationJsonLd: StructuredData = {
+  '@type': 'Organization',
+  '@id': ORGANIZATION_ID,
+  name: company.legalName,
+  alternateName: company.brand,
+  url: canonicalUrl('/'),
+  logo: `${SITE_ORIGIN}/favicon-192.png`,
+  email: company.email,
+  description: company.positioning,
+  areaServed: india,
+  knowsAbout: [
+    'ESG reporting',
+    'Sustainability reporting',
+    'Sustainability communication',
+    'GRI Standards',
+    'BRSR',
+    'UN Sustainable Development Goals',
+    'Sustainability report design',
+  ],
+};
+
+/** Homepage only: names the site for search results (brand rather than legal name). */
+const websiteJsonLd: StructuredData = {
+  '@type': 'WebSite',
+  '@id': WEBSITE_ID,
+  url: canonicalUrl('/'),
+  name: company.brand,
+  alternateName: company.legalName,
+  inLanguage: 'en',
+  publisher: { '@id': ORGANIZATION_ID },
+};
+
+/** A service page. Name and description are the visible title and opening paragraph. */
+const serviceJsonLd = (service: Service): StructuredData => ({
+  '@type': 'Service',
+  '@id': `${canonicalUrl(`/services/${service.slug}`)}#service`,
+  name: service.title,
+  serviceType: service.title,
+  description: service.overview[0],
+  url: canonicalUrl(`/services/${service.slug}`),
+  provider: { '@id': ORGANIZATION_ID },
+  areaServed: india,
+});
+
+/** The JSON-LD graph for a canonical route path, or for the not-found page (null). */
+export function structuredDataFor(path: string | null): StructuredData {
+  const graph: StructuredData[] = [organizationJsonLd];
+  if (path === '/') graph.push(websiteJsonLd);
+  const service = path?.startsWith('/services/') ? serviceBySlug(path.slice('/services/'.length)) : undefined;
+  if (service) graph.push(serviceJsonLd(service));
+  return { '@context': 'https://schema.org', '@graph': graph };
+}
 
 const toPageSeo = (path: string, entry: PageMetaEntry): PageSeo => ({
   path,
@@ -126,6 +256,7 @@ const toPageSeo = (path: string, entry: PageMetaEntry): PageSeo => ({
   ogUrl: canonicalUrl(path),
   twitterTitle: entry.title,
   twitterDescription: entry.description,
+  structuredData: structuredDataFor(path),
 });
 
 export const notFoundSeo: PageSeo = {
@@ -139,6 +270,7 @@ export const notFoundSeo: PageSeo = {
   ogUrl: null,
   twitterTitle: fallbackMeta.title,
   twitterDescription: fallbackMeta.description,
+  structuredData: structuredDataFor(null),
 };
 
 /** Every indexable route, root first, in the order the sitemap lists them. */
@@ -175,22 +307,3 @@ export function resolvePageSeo(pathname: string): PageSeo {
   const route = resolveRoute(pathname);
   return route === null ? notFoundSeo : toPageSeo(route, pageMeta[route]);
 }
-
-/** Organization structured data, emitted once from the app shell. */
-export const organizationJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: company.legalName,
-  alternateName: company.brand,
-  url: company.website,
-  email: company.email,
-  description: company.positioning,
-  knowsAbout: [
-    'ESG reporting',
-    'Sustainability communication',
-    'GRI Standards',
-    'BRSR',
-    'UN Sustainable Development Goals',
-    'Sustainability report design',
-  ],
-};

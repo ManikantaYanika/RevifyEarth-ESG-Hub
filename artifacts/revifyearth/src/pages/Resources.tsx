@@ -10,7 +10,7 @@ export function Resources() {
   return (
     <>
       <PageHero
-        eyebrow="Resources"
+        eyebrow="ESG reporting resources"
         title={
           <>
             Reference for
@@ -48,6 +48,9 @@ export function Resources() {
               <p className="eyebrow text-[#24626b]">{topic.kicker}</p>
               <h3 className="font-display mt-6 text-2xl leading-tight">{topic.title}</h3>
               <p className="mt-4 text-sm leading-7 text-[#3d5a5f]">{topic.body}</p>
+              <div className="mt-6">
+                <ArrowLink href={topic.link.href}>{topic.link.label}</ArrowLink>
+              </div>
             </Reveal>
           ))}
         </div>

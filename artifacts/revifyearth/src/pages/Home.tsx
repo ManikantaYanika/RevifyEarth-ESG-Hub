@@ -74,18 +74,22 @@ export function Home() {
         <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#142b32] via-[#142b32]/40 to-transparent" />
         <Atmosphere dark />
         <div className="mx-auto w-full max-w-[1440px] px-5 pb-16 md:px-10 md:pb-24" data-hero="content">
-          <p className="eyebrow mb-7 text-[#d3dfb2]" data-hero="eyebrow">
-            Sustainability communication / {company.legalName}
-          </p>
-          <h1
-            className="font-display max-w-5xl text-[clamp(3rem,9vw,9rem)] leading-[.87] tracking-[-.06em]"
-            data-hero="title"
-          >
-            Make the work
-            <br />
-            <em>impossible</em>
-            <br />
-            to overlook.
+          {/* Eyebrow inside the h1 so the heading states what the company does, not
+              only the brand line; same pattern and reasoning as PageHero. */}
+          <h1>
+            <span className="eyebrow mb-7 block text-[#d3dfb2]" data-hero="eyebrow">
+              Sustainability communication / {company.legalName}
+            </span>{' '}
+            <span
+              className="font-display block max-w-5xl text-[clamp(3rem,9vw,9rem)] leading-[.87] tracking-[-.06em]"
+              data-hero="title"
+            >
+              Make the work
+              <br />
+              <em>impossible</em>
+              <br />
+              to overlook.
+            </span>
           </h1>
           <div className="mt-10 flex flex-col justify-between gap-8 pt-6 md:flex-row md:items-end relative">
             <span className="absolute inset-x-0 top-0 h-px bg-white/25" data-hero="rule" aria-hidden="true" />
@@ -182,7 +186,7 @@ export function Home() {
       </section>
 
       <WhyRevify />
-      <FrameworkStrip />
+      <FrameworkStrip link={{ href: '/expertise', label: 'Our ESG reporting expertise' }} />
       <StatsBand />
 
       <QuoteBand>Clarity is a form of leadership.</QuoteBand>

@@ -96,21 +96,27 @@ export const pendingContent: readonly PendingSection[] = [
   },
 ];
 
-/** Editorial pipeline — topics grounded in the proposal's own subject matter. */
+/**
+ * Editorial pipeline — topics grounded in the proposal's own subject matter. Each
+ * links to the page that covers its subject in full.
+ */
 export const insightTopics = [
   {
     title: 'Reading a draft against GRI Universal and Topic Standards',
     kicker: 'Disclosure quality',
     body: 'What a chapter-by-chapter gap assessment actually looks for: missing and partial disclosures, boundary inconsistencies, and year-on-year comparability.',
+    link: { href: '/services/content-review', label: 'The gap assessment' },
   },
   {
     title: 'Why framework references fail credibility checks',
     kicker: 'Framework alignment',
     body: 'Cross-referencing to GRI, BRSR and the SDGs only builds trust when the references are integrated into the narrative rather than appended as a compliance table.',
+    link: { href: '/expertise', label: 'Our framework expertise' },
   },
   {
     title: 'The report is not the deliverable',
     kicker: 'Integrated communication',
     body: 'One story across print, film and web reaches stakeholders who will never open a 120-page PDF — and keeps the reporting year alive past launch week.',
+    link: { href: '/services/integrated-communication', label: 'Integrated ESG communication' },
   },
 ];

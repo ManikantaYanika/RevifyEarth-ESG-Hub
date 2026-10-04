@@ -1,5 +1,5 @@
 import { media } from '@/data/media';
-import { SectionLabel } from '@/components/site/Primitives';
+import { ArrowLink, SectionLabel } from '@/components/site/Primitives';
 import { PageHero } from '@/components/site/PageHero';
 import { ResponsiveImage } from '@/components/site/ResponsiveImage';
 import { MotionImage } from '@/components/animation/MotionImage';
@@ -55,10 +55,15 @@ export function Expertise() {
             <br />
             <em>proofreading.</em>
           </h2>
-          <p className="max-w-xl text-sm leading-7 text-[#3d5a5f] md:pt-6">
-            A review assesses whether the information presented is complete, coherent, adequately substantiated and
-            communicated in a manner appropriate for your stakeholders — not just whether the sentences are correct.
-          </p>
+          <div className="max-w-xl md:pt-6">
+            <p className="text-sm leading-7 text-[#3d5a5f]">
+              A review assesses whether the information presented is complete, coherent, adequately substantiated and
+              communicated in a manner appropriate for your stakeholders — not just whether the sentences are correct.
+            </p>
+            <div className="mt-8">
+              <ArrowLink href="/services/content-review">Content review &amp; gap assessment</ArrowLink>
+            </div>
+          </div>
         </div>
 
         <div className="mt-14 grid gap-px border border-[#b8c9bd] bg-[#b8c9bd] sm:grid-cols-2">
@@ -96,6 +101,9 @@ export function Expertise() {
             The challenge is rarely a lack of information. It is making the information land — with the right context,
             confidence and creative signal.
           </p>
+          <div className="mt-8">
+            <ArrowLink href="/resources#insights">Perspectives from the work</ArrowLink>
+          </div>
         </div>
       </section>
 
