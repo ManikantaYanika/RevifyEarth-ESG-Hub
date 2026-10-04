@@ -7,10 +7,11 @@
 #
 # Rules are matched top to bottom; the first match wins.
 
-# Primary host. The deploy subdomain serves the same files as revifyearth.com, so it
-# is sent permanently to the public domain. Matches only this exact host: deploy
-# previews (deploy-preview-N--revifyearth...) and branch deploys are unaffected.
-https://revifyearth.netlify.app/*  https://revifyearth.com/:splat  301!
+# Primary host. The production site's deploy subdomain (revifyearthh.netlify.app)
+# serves the same files as revifyearth.com, so it is sent permanently to the public
+# domain. Matches only this exact host: deploy previews
+# (deploy-preview-N--revifyearthh...) and branch deploys are unaffected.
+https://revifyearthh.netlify.app/*  https://revifyearth.com/:splat  301!
 
 # No API server accompanies this deployment. Fail explicitly so the assistant's
 # status probe sees a non-OK response and hides the launcher, rather than receiving

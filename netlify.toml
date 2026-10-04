@@ -44,7 +44,7 @@
 # Primary host: the deploy subdomain redirects permanently to the public domain.
 # Exact-host match, so deploy previews and branch deploys are not affected.
 [[redirects]]
-  from = "https://revifyearth.netlify.app/*"
+  from = "https://revifyearthh.netlify.app/*"
   to = "https://revifyearth.com/:splat"
   status = 301
   force = true
