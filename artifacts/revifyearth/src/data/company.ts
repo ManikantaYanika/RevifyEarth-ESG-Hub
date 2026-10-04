@@ -86,7 +86,7 @@ export const frameworks = [
   {
     code: 'BRSR',
     name: 'Business Responsibility & Sustainability Report',
-    body: 'Reviewed for alignment and appropriate cross-referencing across the disclosure set.',
+    body: 'SEBI’s sustainability disclosure format for listed companies in India — reviewed for alignment and appropriate cross-referencing across the disclosure set.',
   },
   {
     code: 'UN SDGs',

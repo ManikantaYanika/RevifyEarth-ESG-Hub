@@ -81,8 +81,18 @@ export function StatsBand() {
   );
 }
 
-/** GRI / BRSR / UN SDGs — the credibility signal the site was missing entirely. */
-export function FrameworkStrip({ light = false }: { light?: boolean }) {
+/**
+ * GRI / BRSR / UN SDGs — the credibility signal the site was missing entirely.
+ * `link` adds an onward route under the intro; omitted where the strip would point
+ * at the page it is already on.
+ */
+export function FrameworkStrip({
+  light = false,
+  link,
+}: {
+  light?: boolean;
+  link?: { href: string; label: string };
+}) {
   return (
     <section
       id="frameworks"
@@ -98,10 +108,19 @@ export function FrameworkStrip({ light = false }: { light?: boolean }) {
               <em>with intent.</em>
             </TextReveal>
           </div>
-          <p className={`max-w-xl text-sm leading-7 md:pt-12 ${light ? 'text-white/75' : 'text-[#3d5a5f]'}`}>
-            Framework references only build trust when they are accurate, relevant and integrated into the narrative —
-            not appended as a standalone compliance exercise. Every draft is mapped, cross-referenced and checked.
-          </p>
+          <div className="max-w-xl md:pt-12">
+            <p className={`text-sm leading-7 ${light ? 'text-white/75' : 'text-[#3d5a5f]'}`}>
+              Framework references only build trust when they are accurate, relevant and integrated into the narrative —
+              not appended as a standalone compliance exercise. Every draft is mapped, cross-referenced and checked.
+            </p>
+            {link && (
+              <div className="mt-8">
+                <ArrowLink href={link.href} light={light}>
+                  {link.label}
+                </ArrowLink>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className={`mt-14 grid gap-px ${light ? 'bg-white/10' : 'bg-[#b8c9bd]'} sm:grid-cols-3`}>

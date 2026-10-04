@@ -36,6 +36,18 @@
   PNPM_FLAGS = "--prod=false"
 
 # --- Redirects, in order. Netlify applies the first rule that matches. ------------
+#
+# The published _redirects (artifacts/revifyearth/public/_redirects) is applied
+# before these and additionally carries the per-route rewrites the build generates
+# (/about -> /about.html, ...). The static rules below mirror it; keep them in step.
+
+# Primary host: the deploy subdomain redirects permanently to the public domain.
+# Exact-host match, so deploy previews and branch deploys are not affected.
+[[redirects]]
+  from = "https://revifyearthh.netlify.app/*"
+  to = "https://revifyearth.com/:splat"
+  status = 301
+  force = true
 
 # No API server is deployed alongside this site, so /api must fail rather than be
 # swallowed by the SPA fallback below. Without this it would answer 200 with the
@@ -57,10 +69,12 @@
   to = "/index.html"
   status = 404
 
-# SPA fallback. The site routes client-side with wouter, so a deep link or a refresh
-# on /services/report-design must return index.html rather than 404. Netlify serves
-# real files first, so this only catches paths with no matching asset.
+# Real 404. Every real route is a built HTML file (about.html,
+# services/report-design.html, ...), served directly or through the generated
+# rewrites in _redirects, so a deep link or refresh still returns 200. Anything else
+# gets 404.html — the app shell with `noindex, nofollow` — and status 404, instead
+# of the homepage shell with 200 (a soft 404).
 [[redirects]]
   from = "/*"
-  to = "/index.html"
-  status = 200
+  to = "/404.html"
+  status = 404

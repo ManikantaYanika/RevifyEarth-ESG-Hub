@@ -41,11 +41,16 @@ export function FaqAccordion() {
                       />
                     </button>
                   </dt>
-                  {isOpen && (
-                    <dd id={`faq-${index}`} className="max-w-2xl border-l-2 border-[#a8c95a] pb-7 pl-5 text-sm leading-7 text-[#3d5a5f]">
-                      {faq.answer}
-                    </dd>
-                  )}
+                  {/* Rendered while closed, under `hidden`, so every answer is in the page
+                      a crawler reads rather than only the open one. Looks and behaves
+                      exactly as unmounting did, and aria-controls now always resolves. */}
+                  <dd
+                    id={`faq-${index}`}
+                    hidden={!isOpen}
+                    className="max-w-2xl border-l-2 border-[#a8c95a] pb-7 pl-5 text-sm leading-7 text-[#3d5a5f]"
+                  >
+                    {faq.answer}
+                  </dd>
                 </div>
               );
             })}

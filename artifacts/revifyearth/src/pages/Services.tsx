@@ -10,7 +10,7 @@ export function Services() {
   return (
     <>
       <PageHero
-        eyebrow="What we do"
+        eyebrow="ESG reporting services"
         title={
           <>
             Build the

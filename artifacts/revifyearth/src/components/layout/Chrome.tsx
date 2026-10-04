@@ -2,8 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'wouter';
 
 import { anchorPosition, scrollToTarget } from '@/animations/scroll/lenis';
-import { company } from '@/data/company';
-import { fallbackMeta, organizationJsonLd, pageMeta, socialImage } from '@/data/seo';
+import { resolvePageSeo, socialImageUrl } from '@/data/seo';
 
 /** Keyboard users land here first; the target lives on the main element. */
 export function SkipLink() {
@@ -147,45 +146,48 @@ const upsertLink = (rel: string, href: string) => {
   element.href = href;
 };
 
+const removeHeadElement = (selector: string) => document.head.querySelector(selector)?.remove();
+
 /**
  * Per-route metadata.
  *
- * Adds the `og:image` and `og:url` the previous implementation omitted — the page
- * declared `twitter:card=summary_large_image` with no image to show — plus
- * Organization structured data.
+ * Resolved by `resolvePageSeo`, the same function the build uses to write each
+ * route's HTML, so the head after client-side navigation matches the raw HTML a
+ * crawler received. Canonical and og:url always use the public origin, never the
+ * deploy host, `www` or a preview. A path the router renders as NotFound gets
+ * `noindex, nofollow` and no canonical.
  */
 export function PageMeta() {
   const [location] = useLocation();
 
   useEffect(() => {
-    const meta = pageMeta[location] ?? fallbackMeta;
-    // The public origin, not window.location.origin: a visit through the deploy
-    // host (*.netlify.app) or a preview would otherwise declare that host canonical
-    // and hand it to every link preview.
-    const origin = company.website;
-    const url = `${origin}${location === '/' ? '' : location}`;
-    const image = `${origin}${socialImage}`;
+    const seo = resolvePageSeo(location);
 
-    document.title = meta.title;
-    upsertMeta('description', 'name', meta.description);
-    upsertMeta('og:title', 'property', meta.title);
-    upsertMeta('og:description', 'property', meta.description);
-    upsertMeta('og:url', 'property', url);
-    upsertMeta('og:image', 'property', image);
+    document.title = seo.title;
+    upsertMeta('description', 'name', seo.description);
+    upsertMeta('robots', 'name', seo.robots);
+    upsertMeta('og:title', 'property', seo.ogTitle);
+    upsertMeta('og:description', 'property', seo.ogDescription);
+    upsertMeta('og:image', 'property', socialImageUrl);
     upsertMeta('og:site_name', 'property', 'RevifyEarth');
-    upsertMeta('twitter:title', 'name', meta.title);
-    upsertMeta('twitter:description', 'name', meta.description);
-    upsertMeta('twitter:image', 'name', image);
-    upsertLink('canonical', url);
+    upsertMeta('twitter:title', 'name', seo.twitterTitle);
+    upsertMeta('twitter:description', 'name', seo.twitterDescription);
+    upsertMeta('twitter:image', 'name', socialImageUrl);
+    if (seo.ogUrl) upsertMeta('og:url', 'property', seo.ogUrl);
+    else removeHeadElement('meta[property="og:url"]');
+    if (seo.canonical) upsertLink('canonical', seo.canonical);
+    else removeHeadElement('link[rel="canonical"]');
 
-    let script = document.head.querySelector<HTMLScriptElement>('script[data-jsonld="organization"]');
+    // The same @graph the build wrote into this route's HTML: Organization always,
+    // plus WebSite on the homepage and Service on a service page.
+    let script = document.head.querySelector<HTMLScriptElement>('script[data-jsonld="page"]');
     if (!script) {
       script = document.createElement('script');
       script.type = 'application/ld+json';
-      script.dataset.jsonld = 'organization';
+      script.dataset.jsonld = 'page';
       document.head.appendChild(script);
     }
-    script.textContent = JSON.stringify(organizationJsonLd);
+    script.textContent = JSON.stringify(seo.structuredData);
   }, [location]);
 
   return null;

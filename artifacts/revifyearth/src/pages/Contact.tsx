@@ -81,7 +81,7 @@ export function Contact() {
   return (
     <>
       <PageHero
-        eyebrow="Start here"
+        eyebrow="Contact RevifyEarth"
         title={
           <>
             Your story

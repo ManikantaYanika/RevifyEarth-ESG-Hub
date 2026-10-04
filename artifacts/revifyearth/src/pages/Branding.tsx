@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { media } from '@/data/media';
-import { QuoteBand, SectionLabel } from '@/components/site/Primitives';
+import { ArrowLink, QuoteBand, SectionLabel } from '@/components/site/Primitives';
 import { PageHero } from '@/components/site/PageHero';
 import { Reveal } from '@/components/site/Reveal';
 import { CtaBand, EcosystemFlow } from '@/components/sections/Bands';
@@ -11,6 +11,8 @@ interface Format {
   readonly headline: string;
   readonly body: string;
   readonly points: readonly string[];
+  /** The service page that delivers this format. */
+  readonly service: { readonly href: string; readonly label: string };
 }
 
 const formats: readonly Format[] = [
@@ -24,6 +26,7 @@ const formats: readonly Format[] = [
       'Custom infographics, charts and timelines',
       'Interactive PDF where technically appropriate',
     ],
+    service: { href: '/services/report-design', label: 'Sustainability report design' },
   },
   {
     key: 'Print',
@@ -35,6 +38,7 @@ const formats: readonly Format[] = [
       'Premium cover stock and finishing',
       'Print proof review before the run',
     ],
+    service: { href: '/services/print-production', label: 'Sustainable print production' },
   },
   {
     key: 'Board',
@@ -46,6 +50,7 @@ const formats: readonly Format[] = [
       'Progress against commitments',
       'Strategic forward-looking priorities',
     ],
+    service: { href: '/services/board-presentation', label: 'Board presentation support' },
   },
   {
     key: 'Video',
@@ -57,6 +62,7 @@ const formats: readonly Format[] = [
       'Full HD 1080p output',
       'Two 30-second social cutdowns',
     ],
+    service: { href: '/services/video-report', label: 'Sustainability video reports' },
   },
   {
     key: 'Web',
@@ -68,12 +74,12 @@ const formats: readonly Format[] = [
       'Embedded sustainability video',
       'Mobile-responsive report access',
     ],
+    service: { href: '/services/webpage-development', label: 'Report webpage development' },
   },
 ];
 
 export function Branding() {
   const [active, setActive] = useState(formats[0].key);
-  const current = formats.find((format) => format.key === active) ?? formats[0];
 
   return (
     <>
@@ -118,29 +124,39 @@ export function Branding() {
           })}
         </div>
 
-        <div
-          role="tabpanel"
-          id={`panel-${current.key}`}
-          aria-labelledby={`tab-${current.key}`}
-          className="grid gap-12 py-14 md:grid-cols-[.7fr_1.3fr]"
-        >
-          <h2 className="font-display text-5xl leading-none text-[#24626b] md:text-7xl">
-            {current.key}
-            <br />
-            <em>with intent.</em>
-          </h2>
-          <div className="max-w-xl">
-            <p className="text-2xl font-medium leading-[1.3]">{current.headline}</p>
-            <p className="mt-6 text-sm leading-7 text-[#3d5a5f]">{current.body}</p>
-            <ul className="mt-8 grid gap-px border border-[#b8c9bd] bg-[#b8c9bd] sm:grid-cols-2">
-              {current.points.map((point) => (
-                <li key={point} className="bg-[#f2f0e8] p-4 text-xs leading-6 text-[#3d5a5f]">
-                  {point}
-                </li>
-              ))}
-            </ul>
+        {/* Every panel is rendered and the inactive ones are `hidden`, so all five
+            formats are in the page a crawler reads, and each tab's aria-controls
+            points at a panel that exists. Only the active one is ever visible. */}
+        {formats.map((format) => (
+          <div
+            key={format.key}
+            role="tabpanel"
+            id={`panel-${format.key}`}
+            aria-labelledby={`tab-${format.key}`}
+            hidden={format.key !== active}
+            className="grid gap-12 py-14 md:grid-cols-[.7fr_1.3fr]"
+          >
+            <h2 className="font-display text-5xl leading-none text-[#24626b] md:text-7xl">
+              {format.key}
+              <br />
+              <em>with intent.</em>
+            </h2>
+            <div className="max-w-xl">
+              <p className="text-2xl font-medium leading-[1.3]">{format.headline}</p>
+              <p className="mt-6 text-sm leading-7 text-[#3d5a5f]">{format.body}</p>
+              <ul className="mt-8 grid gap-px border border-[#b8c9bd] bg-[#b8c9bd] sm:grid-cols-2">
+                {format.points.map((point) => (
+                  <li key={point} className="bg-[#f2f0e8] p-4 text-xs leading-6 text-[#3d5a5f]">
+                    {point}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-8">
+                <ArrowLink href={format.service.href}>{format.service.label}</ArrowLink>
+              </div>
+            </div>
           </div>
-        </div>
+        ))}
 
         <Reveal className="mt-6 max-w-3xl border-l-2 border-[#a8c95a] pl-6">
           <p className="text-sm leading-7 text-[#3d5a5f]">

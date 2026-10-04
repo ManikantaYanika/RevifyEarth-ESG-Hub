@@ -1,0 +1,334 @@
+/**
+ * Build-time per-route HTML heads.
+ *
+ * The site is a client-rendered SPA, so before this every URL returned the same
+ * index.html: the homepage title, description and social tags, and no canonical.
+ * Link previews (LinkedIn, WhatsApp, X) never run JavaScript and showed the homepage
+ * for every page; crawlers only saw the right signals after rendering.
+ *
+ * This plugin copies the built index.html once per real route and rewrites only the
+ * SEO tags in its <head>. The body, scripts and styles are untouched, so the same
+ * React app boots on every page exactly as before. Values come from
+ * src/data/seo.ts, the same module the runtime <PageMeta> reads, so the raw HTML
+ * and the hydrated head cannot drift apart.
+ *
+ * Outputs, all in the publish directory:
+ *   - index.html, about.html, services/report-design.html, ... one per route
+ *   - 404.html  noindex shell that Netlify returns with status 404
+ *   - sitemap.xml generated from the same route list
+ *   - _redirects  route rewrites injected at the `# @seo-routes` marker
+ *
+ * The build fails if App.tsx declares a route with no SEO entry, or the reverse;
+ * if the topic map (src/data/topics.ts) points at a route that is not indexable or
+ * gives a page two subjects to own; or if any page's JSON-LD fails
+ * ./structured-data-check.ts.
+ * Flat `about.html` files (not `about/index.html`) are deliberate: a directory
+ * index invites the host to redirect `/about` to `/about/`.
+ */
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+
+import type { Plugin, ResolvedConfig } from 'vite';
+
+import {
+  SITE_ORIGIN,
+  indexableRoutes,
+  notFoundSeo,
+  routeSeo,
+  socialImageUrl,
+  type PageSeo,
+} from '../src/data/seo';
+import { services } from '../src/data/services';
+import { serviceContextLinks, topicClusters } from '../src/data/topics';
+import { assertStructuredData } from './structured-data-check';
+
+const EXPECTED_ORIGIN = 'https://revifyearth.com';
+const ROUTES_MARKER = '# @seo-routes';
+const NOT_FOUND_FILE = '404.html';
+
+export const routeFileName = (route: string): string => (route === '/' ? 'index.html' : `${route.slice(1)}.html`);
+
+const escapeHtml = (value: string): string =>
+  value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+/** Tags this plugin owns. Removed from the shell, then written exactly once. */
+const OWNED_TAGS: readonly RegExp[] = [
+  /<meta\s+name="(?:description|robots|twitter:[a-z:]+)"[^>]*>\s*/gi,
+  /<meta\s+property="og:[a-z:_]+"[^>]*>\s*/gi,
+  /<link\s+rel="canonical"[^>]*>\s*/gi,
+  /<script\s+type="application\/ld\+json"[^>]*>[\s\S]*?<\/script>\s*/gi,
+];
+
+function headBlock(seo: PageSeo): string {
+  const jsonLd = JSON.stringify(seo.structuredData).replace(/</g, '\\u003c');
+  const lines = [
+    `<title>${escapeHtml(seo.title)}</title>`,
+    `<meta name="description" content="${escapeHtml(seo.description)}" />`,
+    `<meta name="robots" content="${escapeHtml(seo.robots)}" />`,
+    seo.canonical ? `<link rel="canonical" href="${escapeHtml(seo.canonical)}" />` : null,
+    `<meta property="og:site_name" content="RevifyEarth" />`,
+    `<meta property="og:type" content="website" />`,
+    `<meta property="og:title" content="${escapeHtml(seo.ogTitle)}" />`,
+    `<meta property="og:description" content="${escapeHtml(seo.ogDescription)}" />`,
+    seo.ogUrl ? `<meta property="og:url" content="${escapeHtml(seo.ogUrl)}" />` : null,
+    `<meta property="og:image" content="${escapeHtml(socialImageUrl)}" />`,
+    `<meta name="twitter:card" content="summary_large_image" />`,
+    `<meta name="twitter:title" content="${escapeHtml(seo.twitterTitle)}" />`,
+    `<meta name="twitter:description" content="${escapeHtml(seo.twitterDescription)}" />`,
+    `<meta name="twitter:image" content="${escapeHtml(socialImageUrl)}" />`,
+    `<script type="application/ld+json" data-jsonld="page">${jsonLd}</script>`,
+  ].filter((line): line is string => line !== null);
+  return `${lines.join('\n    ')}\n    `;
+}
+
+const count = (html: string, pattern: RegExp): number => (html.match(pattern) ?? []).length;
+
+/** Replaces the shell's SEO tags with this page's, then proves the result. */
+export function renderHead(shell: string, seo: PageSeo): string {
+  if (count(shell, /<title>[\s\S]*?<\/title>/gi) !== 1) {
+    throw new Error('seo-prerender: index.html must contain exactly one <title>.');
+  }
+  let html = shell.replace(/<title>[\s\S]*?<\/title>\s*/i, '<!--seo-head-->');
+  for (const tag of OWNED_TAGS) html = html.replace(tag, '');
+  html = html.replace('<!--seo-head-->', headBlock(seo));
+
+  const where = seo.path ?? NOT_FOUND_FILE;
+  const expectOne = (label: string, pattern: RegExp, expected = 1) => {
+    const found = count(html, pattern);
+    if (found !== expected) throw new Error(`seo-prerender: ${where} has ${found} ${label}, expected ${expected}.`);
+  };
+  expectOne('<title>', /<title>/g);
+  expectOne('meta description', /<meta name="description"/g);
+  expectOne('meta robots', /<meta name="robots"/g);
+  expectOne('canonical', /<link rel="canonical"/g, seo.canonical ? 1 : 0);
+  expectOne('og:title', /<meta property="og:title"/g);
+  expectOne('og:description', /<meta property="og:description"/g);
+  expectOne('og:url', /<meta property="og:url"/g, seo.ogUrl ? 1 : 0);
+  expectOne('twitter:card', /<meta name="twitter:card"/g);
+  expectOne('twitter:title', /<meta name="twitter:title"/g);
+  expectOne('twitter:description', /<meta name="twitter:description"/g);
+  expectOne('JSON-LD', /application\/ld\+json/g);
+  expectOne('app root', /<div id="root"><\/div>/g);
+  return html;
+}
+
+/**
+ * Reads the route table from App.tsx itself, so a page added there without an SEO
+ * entry fails the build instead of shipping with the homepage's metadata.
+ */
+export function discoverAppRoutes(appSource: string): string[] {
+  const patterns = [...appSource.matchAll(/<Route\s+path="([^"]+)"/g)].map((match) => match[1]);
+  if (patterns.length === 0) throw new Error('seo-prerender: no <Route path="..."> found in src/App.tsx.');
+
+  const routes: string[] = [];
+  for (const pattern of patterns) {
+    if (!/[:*]/.test(pattern)) routes.push(pattern);
+    else if (pattern === '/services/:slug') routes.push(...services.map((service) => `/services/${service.slug}`));
+    else {
+      throw new Error(
+        `seo-prerender: route "${pattern}" has parameters this build does not know how to expand. ` +
+          'Add its expansion to discoverAppRoutes and its metadata to src/data/seo.ts.',
+      );
+    }
+  }
+  return routes;
+}
+
+function assertCoverage(appRoutes: readonly string[]): void {
+  const problems: string[] = [];
+  const seoSet = new Set(indexableRoutes);
+  const appSet = new Set(appRoutes);
+
+  if (seoSet.size !== indexableRoutes.length) problems.push('duplicate routes in src/data/seo.ts');
+  for (const route of appRoutes) if (!seoSet.has(route)) problems.push(`App route without SEO metadata: ${route}`);
+  for (const route of indexableRoutes) if (!appSet.has(route)) problems.push(`SEO metadata for a route App.tsx does not render: ${route}`);
+  for (const route of indexableRoutes) {
+    if (route !== '/' && (!route.startsWith('/') || route.endsWith('/') || route !== route.toLowerCase())) {
+      problems.push(`route is not in canonical form (leading slash, lowercase, no trailing slash): ${route}`);
+    }
+  }
+  if (problems.length) throw new Error(`seo-prerender: route coverage failed:\n  - ${problems.join('\n  - ')}`);
+}
+
+/** Search results show roughly this much before truncating. Past it is a warning, not an error. */
+const TITLE_SOFT_LIMIT = 65;
+const DESCRIPTION_SOFT_LIMIT = 175;
+
+/** Two pages with the same title or description compete for the same query. */
+function assertDistinctMetadata(pages: readonly PageSeo[], warn: (message: string) => void): void {
+  const problems: string[] = [];
+  for (const field of ['title', 'description'] as const) {
+    const seen = new Map<string, string>();
+    for (const page of pages) {
+      const value = page[field].trim().toLowerCase();
+      const other = seen.get(value);
+      if (other) problems.push(`${page.path} repeats the ${field} of ${other}`);
+      else seen.set(value, page.path!);
+    }
+  }
+  if (problems.length) throw new Error(`seo-prerender: duplicate metadata:\n  - ${problems.join('\n  - ')}`);
+
+  for (const page of pages) {
+    if (page.title.length > TITLE_SOFT_LIMIT) warn(`seo-prerender: ${page.path} title is ${page.title.length} chars`);
+    if (page.description.length > DESCRIPTION_SOFT_LIMIT) {
+      warn(`seo-prerender: ${page.path} description is ${page.description.length} chars`);
+    }
+  }
+}
+
+/**
+ * The topic map is the site's search architecture: one owning page per subject.
+ * Every link it makes must land on an indexable route, and no page may own two
+ * subjects — that is the cannibalisation the map exists to prevent.
+ */
+function assertTopicMap(): void {
+  const problems: string[] = [];
+  const indexable = new Set(indexableRoutes);
+  const routeOf = (href: string) => href.split('#', 1)[0] || '/';
+  const checkLink = (where: string, link: { href: string; label: string }) => {
+    if (!indexable.has(routeOf(link.href))) problems.push(`${where} links to ${link.href}, which is not an indexable route`);
+    if (!link.label.trim()) problems.push(`${where} has a link with no label`);
+  };
+
+  const ids = new Set<string>();
+  const pillars = new Map<string, string>();
+  for (const cluster of topicClusters) {
+    if (ids.has(cluster.id)) problems.push(`topic "${cluster.id}" is declared twice`);
+    ids.add(cluster.id);
+    checkLink(`topic "${cluster.id}" pillar`, cluster.pillar);
+    const pillarRoute = routeOf(cluster.pillar.href);
+    const owner = pillars.get(pillarRoute);
+    if (owner) problems.push(`${pillarRoute} is the pillar of both "${owner}" and "${cluster.id}"`);
+    pillars.set(pillarRoute, cluster.id);
+    for (const link of cluster.supporting) {
+      checkLink(`topic "${cluster.id}"`, link);
+      if (routeOf(link.href) === pillarRoute) problems.push(`topic "${cluster.id}" lists its own pillar as supporting`);
+    }
+  }
+  const slugs = new Set(services.map((service) => service.slug));
+  for (const [slug, link] of Object.entries(serviceContextLinks)) {
+    if (!slugs.has(slug)) problems.push(`serviceContextLinks has an entry for unknown service "${slug}"`);
+    checkLink(`serviceContextLinks["${slug}"]`, link);
+    if (routeOf(link.href) === `/services/${slug}`) problems.push(`serviceContextLinks["${slug}"] links to its own page`);
+  }
+  if (problems.length) throw new Error(`seo-prerender: topic map check failed:\n  - ${problems.join('\n  - ')}`);
+}
+
+function renderSitemap(pages: readonly PageSeo[]): string {
+  const urls = pages.map((page) => `  <url><loc>${escapeHtml(page.canonical!)}</loc></url>`).join('\n');
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
+}
+
+function routeRewrites(): string {
+  return indexableRoutes
+    .filter((route) => route !== '/')
+    .map((route) => `${route}  /${routeFileName(route)}  200`)
+    .join('\n');
+}
+
+export function seoPrerender(): Plugin {
+  let config: ResolvedConfig;
+  let generated = false;
+
+  return {
+    name: 'revify:seo-prerender',
+    apply: 'build',
+    enforce: 'post',
+
+    configResolved(resolved) {
+      config = resolved;
+    },
+
+    generateBundle(_options, bundle) {
+      if (SITE_ORIGIN !== EXPECTED_ORIGIN) {
+        this.error(`seo-prerender: company.website is "${SITE_ORIGIN}", expected "${EXPECTED_ORIGIN}".`);
+      }
+
+      const appSource = readFileSync(path.resolve(config.root, 'src/App.tsx'), 'utf8');
+      assertCoverage(discoverAppRoutes(appSource));
+      assertDistinctMetadata(routeSeo, (message) => config.logger.warn(message));
+      assertTopicMap();
+      try {
+        assertStructuredData(routeSeo, notFoundSeo);
+      } catch (error) {
+        this.error(`seo-prerender: ${(error as Error).message}`);
+      }
+
+      const index = bundle['index.html'];
+      if (!index || index.type !== 'asset') this.error('seo-prerender: index.html is missing from the bundle.');
+      const shell = String(index.source);
+
+      for (const page of routeSeo) {
+        const html = renderHead(shell, page);
+        const fileName = routeFileName(page.path!);
+        if (fileName === 'index.html') index.source = html;
+        else this.emitFile({ type: 'asset', fileName, source: html });
+      }
+      this.emitFile({ type: 'asset', fileName: NOT_FOUND_FILE, source: renderHead(shell, notFoundSeo) });
+      this.emitFile({ type: 'asset', fileName: 'sitemap.xml', source: renderSitemap(routeSeo) });
+      generated = true;
+    },
+
+    /** Runs after the public directory and the bundle are both on disk. */
+    closeBundle() {
+      if (!generated) return;
+      const outDir = path.resolve(config.root, config.build.outDir);
+
+      const redirectsPath = path.join(outDir, '_redirects');
+      if (!existsSync(redirectsPath)) throw new Error('seo-prerender: _redirects was not copied to the output.');
+      const redirects = readFileSync(redirectsPath, 'utf8');
+      if (redirects.split(ROUTES_MARKER).length !== 2) {
+        throw new Error(`seo-prerender: public/_redirects must contain the "${ROUTES_MARKER}" marker exactly once.`);
+      }
+      const written = redirects.replace(ROUTES_MARKER, `${ROUTES_MARKER} (generated from src/data/seo.ts)\n${routeRewrites()}`);
+      writeFileSync(redirectsPath, written);
+
+      // Final proof against what is actually on disk.
+      const problems: string[] = [];
+      const checkJsonLd = (fileName: string, html: string) => {
+        const block = /<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/.exec(html)?.[1];
+        try {
+          const data = JSON.parse(block ?? '');
+          if (data['@context'] !== 'https://schema.org' || !Array.isArray(data['@graph'])) throw new Error('shape');
+          // Every image the markup names (logo, portraits) must be a file that ships.
+          for (const [, url] of (block ?? '').matchAll(/"(?:logo|image)":"([^"]+)"/g)) {
+            const local = path.join(outDir, new URL(url).pathname);
+            if (!existsSync(local)) problems.push(`${fileName} JSON-LD names ${url}, which is not in the build`);
+          }
+        } catch {
+          problems.push(`${fileName} has missing or invalid JSON-LD`);
+        }
+      };
+      for (const page of routeSeo) {
+        const fileName = routeFileName(page.path!);
+        const file = path.join(outDir, fileName);
+        if (!existsSync(file)) {
+          problems.push(`missing ${fileName}`);
+          continue;
+        }
+        const html = readFileSync(file, 'utf8');
+        if (!html.includes(`<link rel="canonical" href="${page.canonical}" />`)) {
+          problems.push(`${fileName} lacks canonical ${page.canonical}`);
+        }
+        checkJsonLd(fileName, html);
+        if (page.path !== '/' && !written.includes(`\n${page.path}  /${routeFileName(page.path!)}  200`)) {
+          problems.push(`_redirects lacks a rewrite for ${page.path}`);
+        }
+      }
+      const notFound = path.join(outDir, NOT_FOUND_FILE);
+      if (!existsSync(notFound) || !readFileSync(notFound, 'utf8').includes('content="noindex, nofollow"')) {
+        problems.push('404.html missing or not noindex');
+      } else {
+        checkJsonLd(NOT_FOUND_FILE, readFileSync(notFound, 'utf8'));
+      }
+      const sitemap = readFileSync(path.join(outDir, 'sitemap.xml'), 'utf8');
+      if (count(sitemap, /<loc>/g) !== routeSeo.length) problems.push('sitemap.xml URL count differs from routes');
+      if (problems.length) throw new Error(`seo-prerender: output check failed:\n  - ${problems.join('\n  - ')}`);
+
+      config.logger.info(
+        `seo-prerender: ${routeSeo.length} route heads, 404.html, sitemap.xml (${routeSeo.length} URLs), ` +
+          `${routeSeo.length - 1} route rewrites`,
+      );
+    },
+  };
+}

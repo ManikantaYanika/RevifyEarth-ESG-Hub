@@ -7,7 +7,7 @@ export function Process() {
   return (
     <>
       <PageHero
-        eyebrow="A considered process"
+        eyebrow="Our reporting process"
         title={
           <>
             From first

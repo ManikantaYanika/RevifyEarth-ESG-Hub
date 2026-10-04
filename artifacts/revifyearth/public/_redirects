@@ -1,11 +1,17 @@
 # Netlify redirects, emitted into the build output by Vite's `public/` passthrough.
 #
-# Duplicates the rules in the repo-root netlify.toml on purpose: this file travels
-# inside the published folder, so a drag-and-drop deploy — or any deploy that does
-# not read netlify.toml — still routes correctly. Netlify merges both, applying
+# Duplicates the static rules in the repo-root netlify.toml on purpose: this file
+# travels inside the published folder, so a drag-and-drop deploy — or any deploy that
+# does not read netlify.toml — still routes correctly. Netlify merges both, applying
 # _redirects first. Keep the two in step.
 #
 # Rules are matched top to bottom; the first match wins.
+
+# Primary host. The production site's deploy subdomain (revifyearthh.netlify.app)
+# serves the same files as revifyearth.com, so it is sent permanently to the public
+# domain. Matches only this exact host: deploy previews
+# (deploy-preview-N--revifyearthh...) and branch deploys are unaffected.
+https://revifyearthh.netlify.app/*  https://revifyearth.com/:splat  301!
 
 # No API server accompanies this deployment. Fail explicitly so the assistant's
 # status probe sees a non-OK response and hides the launcher, rather than receiving
@@ -17,5 +23,15 @@
 # previous build); a 404 lets the app reload once instead of choking on HTML.
 /assets/*  /index.html  404
 
-# Client-side routing: deep links and refreshes resolve to the SPA shell.
-/*      /index.html  200
+# Real routes. The build writes one HTML file per route (about.html,
+# services/report-design.html, ...) with that page's own title, canonical and social
+# tags, and replaces the marker below with a rewrite for each one. The list comes
+# from src/data/seo.ts and the build fails if it disagrees with the routes in
+# src/App.tsx. Netlify matches these with or without a trailing slash, so /about/
+# also serves about.html, whose canonical is /about. Do not add rules that add or
+# strip trailing slashes: Netlify normalises them before matching, so they loop.
+# @seo-routes
+
+# Everything else is a real 404. 404.html is the same app shell with
+# `noindex, nofollow` and no canonical; the app renders its NotFound page.
+/*  /404.html  404
