@@ -80,6 +80,102 @@ export const fallbackMeta: PageMetaEntry = {
 
 export const socialImage = '/assets/revify/hero-birds-1600.webp';
 
+/* ---------------------------------------------------------------------------------
+ * Resolved SEO — the single source for both the runtime <PageMeta> and the build-time
+ * per-route HTML (vite-plugins/seo-prerender.ts). Both read only from here, so the
+ * raw HTML a crawler receives and the head after hydration cannot disagree.
+ *
+ * This module is imported by the Vite config at build time, so it must stay plain
+ * data: relative imports only, no `@/` aliases, no DOM, no asset imports.
+ * ------------------------------------------------------------------------------- */
+
+/** The one public origin. Never the deploy host, `www` or a preview URL. */
+export const SITE_ORIGIN = company.website;
+
+export const ROBOTS_INDEX = 'index, follow';
+export const ROBOTS_NOINDEX = 'noindex, nofollow';
+
+export const socialImageUrl = `${SITE_ORIGIN}${socialImage}`;
+
+export interface PageSeo {
+  /** Canonical route path ("/", "/about", "/services/report-design"); null when not found. */
+  readonly path: string | null;
+  readonly title: string;
+  readonly description: string;
+  /** Absolute canonical URL; null for pages that must not be indexed. */
+  readonly canonical: string | null;
+  readonly robots: string;
+  readonly ogTitle: string;
+  readonly ogDescription: string;
+  readonly ogUrl: string | null;
+  readonly twitterTitle: string;
+  readonly twitterDescription: string;
+}
+
+/** https://revifyearth.com/ for the root, otherwise no trailing slash. */
+export const canonicalUrl = (path: string): string => `${SITE_ORIGIN}${path === '/' ? '/' : path}`;
+
+const toPageSeo = (path: string, entry: PageMetaEntry): PageSeo => ({
+  path,
+  title: entry.title,
+  description: entry.description,
+  canonical: canonicalUrl(path),
+  robots: ROBOTS_INDEX,
+  ogTitle: entry.title,
+  ogDescription: entry.description,
+  ogUrl: canonicalUrl(path),
+  twitterTitle: entry.title,
+  twitterDescription: entry.description,
+});
+
+export const notFoundSeo: PageSeo = {
+  path: null,
+  title: fallbackMeta.title,
+  description: fallbackMeta.description,
+  canonical: null,
+  robots: ROBOTS_NOINDEX,
+  ogTitle: fallbackMeta.title,
+  ogDescription: fallbackMeta.description,
+  ogUrl: null,
+  twitterTitle: fallbackMeta.title,
+  twitterDescription: fallbackMeta.description,
+};
+
+/** Every indexable route, root first, in the order the sitemap lists them. */
+export const indexableRoutes: readonly string[] = Object.keys(pageMeta);
+
+export const routeSeo: readonly PageSeo[] = indexableRoutes.map((path) => toPageSeo(path, pageMeta[path]));
+
+const serviceSlugs = new Set(services.map((service) => service.slug));
+
+/**
+ * Maps a requested pathname to the canonical route it renders, or null when the
+ * router would render NotFound. Mirrors wouter exactly rather than guessing:
+ * wouter (regexparam) matches case-insensitively with one optional trailing slash,
+ * while ServiceDetail compares the slug case-sensitively. So "/About/" renders the
+ * About page and canonicalises to "/about", but "/services/Report-Design" renders
+ * NotFound and must stay noindex.
+ */
+export function resolveRoute(pathname: string): string | null {
+  const path = (pathname.split(/[?#]/, 1)[0] || '/').replace(/^(?!\/)/, '/');
+  if (path === '/') return '/';
+  const trimmed = path.endsWith('/') ? path.slice(0, -1) : path;
+
+  const service = /^\/services\/([^/]+)$/i.exec(trimmed);
+  if (service) {
+    const slug = service[1];
+    return serviceSlugs.has(slug) ? `/services/${slug}` : null;
+  }
+
+  const key = trimmed.toLowerCase();
+  return key !== '/' && Object.prototype.hasOwnProperty.call(pageMeta, key) ? key : null;
+}
+
+export function resolvePageSeo(pathname: string): PageSeo {
+  const route = resolveRoute(pathname);
+  return route === null ? notFoundSeo : toPageSeo(route, pageMeta[route]);
+}
+
 /** Organization structured data, emitted once from the app shell. */
 export const organizationJsonLd = {
   '@context': 'https://schema.org',
