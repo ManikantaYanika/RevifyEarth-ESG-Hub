@@ -70,7 +70,7 @@ export function MobileNav({ open, onClose }: { open: boolean; onClose: () => voi
 
   // Focus lands one commit later, once `mounted` has put the panel in the DOM.
   // Focusing the panel rather than its first control announces the dialog instead
-  // of dropping a screen-reader user straight onto "Platform".
+  // of dropping a screen-reader user straight onto the first menu group.
   useEffect(() => {
     if (!open || !mounted) return;
     panelRef.current?.focus({ preventScroll: true });

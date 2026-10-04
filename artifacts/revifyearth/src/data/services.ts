@@ -402,7 +402,9 @@ export const services: readonly Service[] = [
     slug: 'webpage-development',
     index: '06',
     title: 'Sustainability Report Webpage Development',
-    shortTitle: 'ESG Websites',
+    // One webpage for the report — the scope excludes changes to the corporate
+    // website — so not "ESG Websites", which promised more than is delivered.
+    shortTitle: 'Report Webpages',
     tagline: 'Extending the sustainability narrative into an accessible digital experience.',
     summary:
       'A responsive digital home for the report — from sustainability overview and thematic content to video and downloadable access.',

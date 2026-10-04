@@ -1,4 +1,5 @@
 import { company, designTeam, foundingTeam, type TeamMember } from './company';
+import { media, assetUrl, type ImageAsset } from './media';
 import { serviceBySlug, services, type Service } from './services';
 
 export interface PageMetaEntry {
@@ -66,9 +67,9 @@ const base: Record<string, PageMetaEntry> = {
       'Meet the founding team of ESG industry experts and the core design team behind RevifyEarth’s sustainability reports, presentations, films and webpages.',
   },
   '/projects': {
-    title: 'How an ESG Communication Engagement Works — RevifyEarth',
+    title: 'ESG Communication Engagement Model — RevifyEarth',
     description:
-      'How a sustainability communication engagement is built: content review, report design, sustainable print, video report and webpage, sequenced around the reporting cycle.',
+      'The five components of a RevifyEarth engagement — content review, report design, sustainable print, video report and webpage — and why each inherits the approved narrative.',
   },
   '/resources': {
     title: 'ESG Reporting Resources & FAQs — RevifyEarth',
@@ -172,7 +173,52 @@ export interface PageSeo {
   readonly twitterDescription: string;
   /** JSON-LD for this page: one @graph, emitted as a single script tag. */
   readonly structuredData: StructuredData;
+  /** The page's hero image (its LCP element), preloaded from the HTML head; null when there is none. */
+  readonly heroPreload: HeroPreload | null;
 }
+
+export interface HeroPreload {
+  readonly href: string;
+  readonly srcset: string;
+  readonly sizes: string;
+}
+
+/*
+ * Hero image per route, preloaded from the prerendered head so the LCP image starts
+ * downloading while the JavaScript does, instead of after React renders the hero.
+ * Every hero is full-bleed (`sizes="100vw"`). Must match the `image` each page passes
+ * to PageHero (Home: its hero ResponsiveImage); a service page uses `service.image`.
+ * A mismatch costs a wasted download, so the release validation compares the preload
+ * with the hero the browser actually rendered.
+ */
+const pageHeroes: Readonly<Record<string, ImageAsset>> = {
+  '/': media.heroBirds,
+  '/about': media.forestMist,
+  '/services': media.volcano,
+  '/expertise': media.heroBirds,
+  '/sustainability-branding': media.mountainSunset,
+  '/industries': media.volcano,
+  '/process': media.forestMist,
+  '/team': media.heroBirds,
+  '/projects': media.mountainSunset,
+  '/resources': media.iceberg,
+  '/contact': media.heroBirds,
+};
+
+// No fetchpriority on the preload: with it, plus the route's modulepreloads, headless
+// Chrome intermittently stalled under throttled lab runs, and LCP measured the same
+// without it. `href` is only the fallback for browsers that ignore imagesrcset.
+const toPreload = (asset: ImageAsset): HeroPreload => ({
+  href: assetUrl(`${asset.base}-${asset.widths[0]}.webp`),
+  srcset: asset.widths.map((w) => `${assetUrl(`${asset.base}-${w}.webp`)} ${w}w`).join(', '),
+  sizes: '100vw',
+});
+
+const heroPreloadFor = (path: string): HeroPreload | null => {
+  const service = path.startsWith('/services/') ? serviceBySlug(path.slice('/services/'.length)) : undefined;
+  const asset = service ? service.image : pageHeroes[path];
+  return asset ? toPreload(asset) : null;
+};
 
 /** https://revifyearth.com/ for the root, otherwise no trailing slash. */
 export const canonicalUrl = (path: string): string => `${SITE_ORIGIN}${path === '/' ? '/' : path}`;
@@ -337,6 +383,7 @@ const toPageSeo = (path: string, entry: PageMetaEntry): PageSeo => ({
   twitterTitle: entry.title,
   twitterDescription: entry.description,
   structuredData: structuredDataFor(path),
+  heroPreload: heroPreloadFor(path),
 });
 
 export const notFoundSeo: PageSeo = {
@@ -351,6 +398,7 @@ export const notFoundSeo: PageSeo = {
   twitterTitle: fallbackMeta.title,
   twitterDescription: fallbackMeta.description,
   structuredData: structuredDataFor(null),
+  heroPreload: null,
 };
 
 /** Every indexable route, root first, in the order the sitemap lists them. */

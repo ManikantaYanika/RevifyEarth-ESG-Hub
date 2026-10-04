@@ -18,17 +18,24 @@
  *   - sitemap.xml generated from the same route list
  *   - _redirects  route rewrites injected at the `# @seo-routes` marker
  *
+ * Each route's head also preloads that page's hero image (its LCP element) and
+ * modulepreloads its lazily loaded page chunk, so both download alongside the entry
+ * bundle instead of only after React has started and asked for them.
+ *
  * The build fails if App.tsx declares a route with no SEO entry, or the reverse;
  * if the topic map (src/data/topics.ts) points at a route that is not indexable or
  * gives a page two subjects to own; or if any page's JSON-LD fails
- * ./structured-data-check.ts.
+ * ./structured-data-check.ts; or if an internal link fails ./link-check.ts.
  * Flat `about.html` files (not `about/index.html`) are deliberate: a directory
  * index invites the host to redirect `/about` to `/about/`.
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import type { Plugin, ResolvedConfig } from 'vite';
+import type { Plugin, ResolvedConfig, Rollup } from 'vite';
+
+type OutputBundle = Rollup.OutputBundle;
+type OutputChunk = Rollup.OutputChunk;
 
 import {
   SITE_ORIGIN,
@@ -40,6 +47,7 @@ import {
 } from '../src/data/seo';
 import { services } from '../src/data/services';
 import { serviceContextLinks, topicClusters } from '../src/data/topics';
+import { assertInternalLinks, type LinkCheckSummary } from './link-check';
 import { assertStructuredData } from './structured-data-check';
 
 const EXPECTED_ORIGIN = 'https://revifyearth.com';
@@ -57,9 +65,12 @@ const OWNED_TAGS: readonly RegExp[] = [
   /<meta\s+property="og:[a-z:_]+"[^>]*>\s*/gi,
   /<link\s+rel="canonical"[^>]*>\s*/gi,
   /<script\s+type="application\/ld\+json"[^>]*>[\s\S]*?<\/script>\s*/gi,
+  // index.html's development default preloads the homepage hero on every route.
+  /<link\s+rel="preload"\s+as="image"[^>]*>\s*/gi,
 ];
 
-function headBlock(seo: PageSeo): string {
+function headBlock(seo: PageSeo, modulePreloads: readonly string[]): string {
+  const hero = seo.heroPreload;
   const jsonLd = JSON.stringify(seo.structuredData).replace(/</g, '\\u003c');
   const lines = [
     `<title>${escapeHtml(seo.title)}</title>`,
@@ -77,6 +88,10 @@ function headBlock(seo: PageSeo): string {
     `<meta name="twitter:description" content="${escapeHtml(seo.twitterDescription)}" />`,
     `<meta name="twitter:image" content="${escapeHtml(socialImageUrl)}" />`,
     `<script type="application/ld+json" data-jsonld="page">${jsonLd}</script>`,
+    hero
+      ? `<link rel="preload" as="image" href="${escapeHtml(hero.href)}" imagesrcset="${escapeHtml(hero.srcset)}" imagesizes="${escapeHtml(hero.sizes)}" />`
+      : null,
+    ...modulePreloads.map((href) => `<link rel="modulepreload" crossorigin href="${escapeHtml(href)}" />`),
   ].filter((line): line is string => line !== null);
   return `${lines.join('\n    ')}\n    `;
 }
@@ -84,13 +99,13 @@ function headBlock(seo: PageSeo): string {
 const count = (html: string, pattern: RegExp): number => (html.match(pattern) ?? []).length;
 
 /** Replaces the shell's SEO tags with this page's, then proves the result. */
-export function renderHead(shell: string, seo: PageSeo): string {
+export function renderHead(shell: string, seo: PageSeo, modulePreloads: readonly string[] = []): string {
   if (count(shell, /<title>[\s\S]*?<\/title>/gi) !== 1) {
     throw new Error('seo-prerender: index.html must contain exactly one <title>.');
   }
   let html = shell.replace(/<title>[\s\S]*?<\/title>\s*/i, '<!--seo-head-->');
   for (const tag of OWNED_TAGS) html = html.replace(tag, '');
-  html = html.replace('<!--seo-head-->', headBlock(seo));
+  html = html.replace('<!--seo-head-->', headBlock(seo, modulePreloads));
 
   const where = seo.path ?? NOT_FOUND_FILE;
   const expectOne = (label: string, pattern: RegExp, expected = 1) => {
@@ -108,6 +123,7 @@ export function renderHead(shell: string, seo: PageSeo): string {
   expectOne('twitter:title', /<meta name="twitter:title"/g);
   expectOne('twitter:description', /<meta name="twitter:description"/g);
   expectOne('JSON-LD', /application\/ld\+json/g);
+  expectOne('hero preload', /<link rel="preload" as="image"/g, seo.heroPreload ? 1 : 0);
   expectOne('app root', /<div id="root"><\/div>/g);
   return html;
 }
@@ -132,6 +148,59 @@ export function discoverAppRoutes(appSource: string): string[] {
     }
   }
   return routes;
+}
+
+/**
+ * The lazily loaded page chunk (plus its own imports) behind each route, read from
+ * App.tsx and the bundle. Home is in the entry chunk and needs none. A route whose
+ * page cannot be traced only loses the hint, so that is a warning, not a failure.
+ */
+function routeChunkPreloads(
+  appSource: string,
+  bundle: OutputBundle,
+  base: string,
+  warn: (message: string) => void,
+): Map<string | null, string[]> {
+  const pageOf = new Map<string, string>();
+  for (const [, name, page] of appSource.matchAll(/const (\w+) = (?:named|lazy)\(\(\) =>\s*import\('@\/pages\/(\w+)'\)/g)) {
+    pageOf.set(name, page);
+  }
+  const componentOf = new Map<string | null, string>();
+  for (const [, route, name] of appSource.matchAll(/<Route path="([^"]+)" component=\{(\w+)\}/g)) componentOf.set(route, name);
+  for (const [, route, name] of appSource.matchAll(/<Route path="([^"]+)">\{\(\w+\) => <(\w+)/g)) componentOf.set(route, name);
+  const fallback = /<Route component=\{(\w+)\} \/>/.exec(appSource)?.[1];
+  if (fallback) componentOf.set(null, fallback);
+
+  const chunks = Object.values(bundle).filter((item): item is OutputChunk => item.type === 'chunk');
+  const byName = new Map(chunks.map((chunk) => [chunk.fileName, chunk]));
+  const closure = (start: string, into = new Set<string>()) => {
+    if (into.has(start)) return into;
+    into.add(start);
+    for (const next of byName.get(start)?.imports ?? []) closure(next, into);
+    return into;
+  };
+  const eager = new Set<string>();
+  for (const chunk of chunks) if (chunk.isEntry) closure(chunk.fileName, eager);
+
+  const result = new Map<string | null, string[]>();
+  const routeKey = (route: string | null) => (route?.startsWith('/services/') ? '/services/:slug' : route);
+  for (const route of [...indexableRoutes, null]) {
+    const component = componentOf.get(routeKey(route));
+    const page = component ? pageOf.get(component) : undefined;
+    if (!page) {
+      if (route !== '/') warn(`seo-prerender: no lazy page chunk traced for ${route ?? '404'}`);
+      result.set(route, []);
+      continue;
+    }
+    const chunk = chunks.find((candidate) => candidate.facadeModuleId?.replace(/\\/g, '/').endsWith(`/src/pages/${page}.tsx`));
+    if (!chunk) {
+      warn(`seo-prerender: page ${page} has no chunk of its own`);
+      result.set(route, []);
+      continue;
+    }
+    result.set(route, [...closure(chunk.fileName)].filter((file) => !eager.has(file)).map((file) => `${base}${file}`));
+  }
+  return result;
 }
 
 function assertCoverage(appRoutes: readonly string[]): void {
@@ -229,6 +298,7 @@ function routeRewrites(): string {
 export function seoPrerender(): Plugin {
   let config: ResolvedConfig;
   let generated = false;
+  let linkSummary: LinkCheckSummary = { links: 0, anchors: 0 };
 
   return {
     name: 'revify:seo-prerender',
@@ -249,6 +319,11 @@ export function seoPrerender(): Plugin {
       assertDistinctMetadata(routeSeo, (message) => config.logger.warn(message));
       assertTopicMap();
       try {
+        linkSummary = assertInternalLinks(path.resolve(config.root, 'src'));
+      } catch (error) {
+        this.error(`seo-prerender: ${(error as Error).message}`);
+      }
+      try {
         assertStructuredData(routeSeo, notFoundSeo);
       } catch (error) {
         this.error(`seo-prerender: ${(error as Error).message}`);
@@ -258,13 +333,14 @@ export function seoPrerender(): Plugin {
       if (!index || index.type !== 'asset') this.error('seo-prerender: index.html is missing from the bundle.');
       const shell = String(index.source);
 
+      const preloads = routeChunkPreloads(appSource, bundle, config.base, (message) => config.logger.warn(message));
       for (const page of routeSeo) {
-        const html = renderHead(shell, page);
+        const html = renderHead(shell, page, preloads.get(page.path) ?? []);
         const fileName = routeFileName(page.path!);
         if (fileName === 'index.html') index.source = html;
         else this.emitFile({ type: 'asset', fileName, source: html });
       }
-      this.emitFile({ type: 'asset', fileName: NOT_FOUND_FILE, source: renderHead(shell, notFoundSeo) });
+      this.emitFile({ type: 'asset', fileName: NOT_FOUND_FILE, source: renderHead(shell, notFoundSeo, preloads.get(null) ?? []) });
       this.emitFile({ type: 'asset', fileName: 'sitemap.xml', source: renderSitemap(routeSeo) });
       generated = true;
     },
@@ -327,7 +403,7 @@ export function seoPrerender(): Plugin {
 
       config.logger.info(
         `seo-prerender: ${routeSeo.length} route heads, 404.html, sitemap.xml (${routeSeo.length} URLs), ` +
-          `${routeSeo.length - 1} route rewrites`,
+          `${routeSeo.length - 1} route rewrites; ${linkSummary.links} internal links and ${linkSummary.anchors} anchors checked`,
       );
     },
   };

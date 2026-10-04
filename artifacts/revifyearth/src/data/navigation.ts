@@ -20,14 +20,16 @@ export interface NavGroup {
 
 export const navGroups: readonly NavGroup[] = [
   {
-    label: 'Platform',
+    // "Capabilities", not "Platform": RevifyEarth is a reporting and communication
+    // partner, and a "Platform" menu reads as ESG software it does not make.
+    label: 'Capabilities',
     href: '/sustainability-branding',
     intro: 'One sustainability narrative, carried consistently across every stakeholder touchpoint.',
     links: [
-      { label: 'ESG Strategy & Advisory', href: '/expertise', summary: 'Framework alignment, disclosure quality and reporting direction.' },
+      { label: 'ESG Reporting Expertise', href: '/expertise', summary: 'Framework alignment, disclosure quality and reporting direction.' },
       { label: 'ESG Report Design', href: '/services/report-design', summary: 'Editorial systems, data visualisation and narrative architecture.' },
       { label: 'ESG Branding', href: '/sustainability-branding', summary: 'One identity across report, print, board, film and web.' },
-      { label: 'ESG Websites', href: '/services/webpage-development', summary: 'A responsive digital home for the reporting year.' },
+      { label: 'Report Webpages', href: '/services/webpage-development', summary: 'A responsive digital home for the reporting year.' },
       { label: 'Video Reports', href: '/services/video-report', summary: 'A 5–7 minute visual narrative built from the approved report.' },
       { label: 'Board Presentations', href: '/services/board-presentation', summary: 'Executive-level distillation for leadership forums.' },
     ],

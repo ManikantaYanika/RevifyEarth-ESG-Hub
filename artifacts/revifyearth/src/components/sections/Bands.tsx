@@ -67,12 +67,14 @@ export function StatsBand() {
         <SectionLabel light>What an engagement commits to</SectionLabel>
         <dl className="grid gap-px border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat, index) => (
-            <Reveal key={stat.label} order={index} className="fx-card fx-card-tile bg-[#142b32] p-8">
-              <dd className="font-display text-6xl leading-none tracking-[-.04em] text-[#a8c95a] md:text-7xl">
+            // A <dl> group must be dt then dd, with nothing else inside: the term comes
+            // first in the markup and `order-first` keeps the figure on top visually.
+            <Reveal key={stat.label} order={index} className="fx-card fx-card-tile flex flex-col bg-[#142b32] p-8">
+              <dt className="mt-5 text-sm font-bold">{stat.label}</dt>
+              <dd className="order-first font-display text-6xl leading-none tracking-[-.04em] text-[#a8c95a] md:text-7xl">
                 <Counter to={stat.value} suffix={stat.suffix} />
               </dd>
-              <dt className="mt-5 text-sm font-bold">{stat.label}</dt>
-              <p className="mt-2 text-xs leading-6 text-white/70">{stat.note}</p>
+              <dd className="mt-2 text-xs leading-6 text-white/70">{stat.note}</dd>
             </Reveal>
           ))}
         </dl>
