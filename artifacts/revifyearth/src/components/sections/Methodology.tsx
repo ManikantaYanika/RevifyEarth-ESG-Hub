@@ -2,7 +2,7 @@ import { Check, ChevronDown, X } from 'lucide-react';
 import { useState } from 'react';
 
 import { exclusions, inclusions, milestones, phases, timelineNote } from '@/data/methodology';
-import { SectionLabel } from '@/components/site/Primitives';
+import { ArrowLink, SectionLabel } from '@/components/site/Primitives';
 import { Reveal } from '@/components/site/Reveal';
 
 const ownerTone: Record<string, string> = {
@@ -87,6 +87,15 @@ export function MethodologyTimeline() {
                         </li>
                       ))}
                     </ul>
+                    {phase.services && (
+                      <div className="mt-4 flex flex-wrap gap-x-8">
+                        {phase.services.map((service) => (
+                          <ArrowLink key={service.href} href={service.href}>
+                            {service.label}
+                          </ArrowLink>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               );

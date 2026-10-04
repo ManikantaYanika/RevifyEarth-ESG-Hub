@@ -10,6 +10,8 @@ export interface Phase {
   readonly owner: 'Revify' | 'Client' | 'Both';
   readonly steps: readonly string[];
   readonly detail: string;
+  /** The service pages that cover the work done in this phase. */
+  readonly services?: readonly { readonly href: string; readonly label: string }[];
 }
 
 export const phases: readonly Phase[] = [
@@ -28,6 +30,10 @@ export const phases: readonly Phase[] = [
     steps: ['Literature review', 'Data collection support', 'Gap analysis', 'Theme development and report design'],
     detail:
       'Running in parallel: a chapter-by-chapter technical review against GRI Universal and Topic Standards, and the creative work that turns the reviewed content into five theme directions and then a designed draft.',
+    services: [
+      { href: '/services/content-review', label: 'Content review & gap assessment' },
+      { href: '/services/report-design', label: 'Report design' },
+    ],
   },
   {
     index: '03',
@@ -36,6 +42,7 @@ export const phases: readonly Phase[] = [
     steps: ['Narrative and creative concept', 'Script and storyboard', 'Visual production'],
     detail:
       'Once the report narrative is approved, the same story is rebuilt for motion — concept, script, storyboard, then motion graphics and animated ESG KPIs aligned to the approved report theme.',
+    services: [{ href: '/services/video-report', label: 'Video report' }],
   },
   {
     index: '04',
@@ -44,6 +51,7 @@ export const phases: readonly Phase[] = [
     steps: ['Interactive overview build', 'ESG performance dashboard', 'Video integration and report access'],
     detail:
       'The digital gateway is assembled from approved content: overview, highlights, thematic sections, embedded film and clear access to the full report.',
+    services: [{ href: '/services/webpage-development', label: 'Report webpage' }],
   },
   {
     index: '05',
@@ -52,6 +60,10 @@ export const phases: readonly Phase[] = [
     steps: ['Consolidate results and final report', 'Presentation of results'],
     detail:
       'Everything converges: the final report, the print run, the board presentation, the film and the webpage — presented back as one connected outcome.',
+    services: [
+      { href: '/services/print-production', label: 'Sustainable print' },
+      { href: '/services/board-presentation', label: 'Board presentation' },
+    ],
   },
 ];
 

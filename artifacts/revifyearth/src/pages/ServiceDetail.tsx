@@ -158,6 +158,11 @@ export function ServiceDetail({ slug }: { slug: string }) {
                 </div>
               ))}
             </dl>
+            {/* The general FAQ covers scope, timelines and what is needed from the client
+                for every service; each page carries only its own one or two questions. */}
+            <div className="mt-6">
+              <ArrowLink href="/resources#faqs">Scope &amp; timeline FAQs</ArrowLink>
+            </div>
 
             {service.related.length > 0 && (
               <div className="mt-10">

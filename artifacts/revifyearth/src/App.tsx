@@ -1,9 +1,5 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Component, Suspense, lazy, type ReactNode } from 'react';
 import { Route, Switch, Router as WouterRouter, useLocation } from 'wouter';
-
-import { Toaster } from '@/components/ui/toaster';
-import { TooltipProvider } from '@/components/ui/tooltip';
 
 import { Assistant } from '@/components/layout/Assistant';
 import { PageMeta, ScrollProgress, ScrollToTop, SkipLink } from '@/components/layout/Chrome';
@@ -14,8 +10,6 @@ import { InteractionLayer } from '@/components/animation/InteractionLayer';
 import { AmbientBackdrop } from '@/components/site/Atmosphere';
 import { ActionButton } from '@/components/site/Primitives';
 import { Home } from '@/pages/Home';
-
-const queryClient = new QueryClient();
 
 /**
  * Home ships in the initial chunk because it is the landing route; every other page
@@ -39,9 +33,14 @@ const Resources = named(() => import('@/pages/Resources'), 'Resources');
 const Contact = named(() => import('@/pages/Contact'), 'Contact');
 const NotFound = named(() => import('@/pages/NotFound'), 'NotFound');
 
+/**
+ * Shown while a route's chunk loads. Fills the viewport so the footer starts below
+ * the fold: at 60vh the footer was on screen and jumped down when the page arrived,
+ * which was the whole of a ~0.31 CLS on every directly loaded page except Home.
+ */
 function RouteLoading() {
   return (
-    <div className="flex min-h-[60vh] items-center justify-center bg-[#f2f0e8]" role="status" aria-live="polite">
+    <div className="flex min-h-dvh items-center justify-center bg-[#f2f0e8]" role="status" aria-live="polite">
       <span className="sr-only">Loading page</span>
       <span className="route-loader" aria-hidden="true" />
     </div>
@@ -150,16 +149,17 @@ function Shell() {
   );
 }
 
+/*
+ * No query-client, tooltip or toast providers: nothing on the site queries, shows a
+ * tooltip or raises a toast, and mounting them put React Query, Radix Toast/Tooltip,
+ * floating-ui and tailwind-merge into the bundle every page loads first. Wrap the
+ * shell in the relevant provider again if a component starts to need one.
+ */
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
-          <Shell />
-        </WouterRouter>
-        <Toaster />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+      <Shell />
+    </WouterRouter>
   );
 }
 

@@ -13,6 +13,8 @@ How the site is organised for search, and the rules for changing it. Phases B (t
 | Titles, descriptions, canonicals, robots, JSON-LD | `src/data/seo.ts` | `vite-plugins/seo-prerender.ts` |
 | Subject ownership (topic clusters) | `src/data/topics.ts` | `assertTopicMap` in the prerender plugin |
 | Structured-data rules | `src/data/seo.ts` | `vite-plugins/structured-data-check.ts` |
+| Internal links and anchors | literal `href`s in `src/` | `vite-plugins/link-check.ts` |
+| Hero preload and page-chunk preload per route | `pageHeroes` in `src/data/seo.ts`; `App.tsx` routes | `seo-prerender.ts` |
 
 Every check fails the build rather than warning. The runtime head (`PageMeta` in `Chrome.tsx`) and the prerendered HTML read the same values, so they cannot disagree.
 
@@ -53,6 +55,10 @@ Seven of these subjects are clusters in `src/data/topics.ts`. They appear on the
 4. **Anchor text describes the destination.** A site-wide nav label is a site-wide anchor-text signal. Two labels were corrected for this reason:
    - "Sustainability Reporting", which pointed at `/services/report-design`, is now "ESG Report Design". It was signalling that the design page owned "sustainability reporting".
    - "Case Studies", which pointed at `/projects`, is now "Engagement Model". The page explicitly has no case studies yet.
+   - Phase G corrected three more:
+     - The "Platform" menu group is now "Capabilities", because RevifyEarth is not software.
+     - "ESG Strategy & Advisory" is now "ESG Reporting Expertise", because no advisory service exists.
+     - "ESG Websites" is now "Report Webpages", because the deliverable is one report webpage.
 5. **Restraint with framework names.** BRSR and GRI appear where the page's subject needs them: home, expertise, content review, industries. Pages whose subject is something else (contact, resources) do not list them as keywords.
 
 ### New topic pages: when one is justified
@@ -152,15 +158,17 @@ The footer contact list shows **"Anu Ananya — Partnership Manager / CFO"**. Th
 
 These are not published and not rendered anywhere. None should be written until the listed input exists. Three of them are already promised on `/resources` ("ask and we will send the underlying note"), so the notes exist in some form.
 
-| Working title | Cluster | Required input |
-|---|---|---|
-| Reading a draft against GRI Universal and Topic Standards | frameworks / review | The underlying note from the ESG team; author from `/team` |
-| Why framework references fail credibility checks | frameworks | The underlying note; examples anonymised |
-| What a BRSR alignment review checks, and what it does not | frameworks | ESG lead authorship; every regulatory statement cited to the current SEBI circular, with the date checked |
-| Preparing a draft for review: what to send and when | review | Built on the "What do you need from us?" FAQ; client sign-off |
-| Making ESG data readable: charts, KPIs and comparability | design | Designer-authored; report imagery cleared for publication |
-| The report is not the deliverable | communication | The underlying note |
-| Planning the reporting calendar around data collection | process | ESG lead authorship. Built on the timeline note, including the six-week data-collection assumption. |
+Re-audited in Phase G. Priority 1 articles are already promised on `/resources` ("ask and we will send the underlying note"), so the first-party material exists.
+
+| Priority | Working title | Cluster | Search intent | Links to | Required input |
+|---|---|---|---|---|---|
+| 1 | Reading a draft against GRI Universal and Topic Standards (absorbs "Preparing a draft for review") | frameworks / review | Informational: teams with a draft report | `/services/content-review`, `/expertise` | The underlying note from the ESG team; author from `/team` |
+| 1 | Why framework references fail credibility checks | frameworks | Informational | `/expertise` | The underlying note; examples anonymised |
+| 1 | The report is not the deliverable | communication | Commercial investigation | `/services/integrated-communication` | The underlying note |
+| 2 | What a BRSR alignment review checks, and what it does not | frameworks | Informational, high value | `/expertise`, `/services/content-review` | ESG lead authorship; every regulatory statement cited to the current SEBI circular, with the date checked; expert review before publishing |
+| 3 | Planning the reporting calendar around data collection | process | Informational | `/process` | ESG lead authorship. Built on the timeline note, including the six-week data-collection assumption. |
+
+Dropped for now: "Making ESG data readable". It has no first-party support until report imagery is cleared for publication. Restore it when that changes.
 
 ### Editorial rules
 
@@ -179,3 +187,104 @@ The route system does not exist yet: building it before there is content to put 
 4. Add `Article` (and `Person` as a reference for its author) to `ALLOWED_TYPES` in `structured-data-check.ts`. Emit it from `structuredDataFor` with `author` → the author's `/team` `#id`, `publisher` → Organization, and the two dates.
 5. List the article under its cluster's `supporting` links in `topics.ts`, so it appears in the topic guide. Link to the pillar from the article body.
 6. The sitemap, the route rewrites, the 404 handling and all checks pick the new route up from steps 2 and 3.
+
+---
+
+## J. Governance & monitoring
+
+Search Console and Netlify are configured outside this repository. Everything below is a manual step. Record what Search Console reports; never assume it. A URL is indexed only when URL Inspection says "URL is on Google".
+
+### One-time setup
+
+1. **Property.** In Google Search Console, add a **Domain property** for `revifyearth.com`. Verify it with the DNS TXT record at the domain registrar. A domain property covers `https`, `www` and every path, so canonical problems on any variant show up.
+2. **Sitemap.** Submit `https://revifyearth.com/sitemap.xml` under *Indexing → Sitemaps*. Expect "Success" with **18 discovered URLs**. A different number means the sitemap and the live site disagree. `robots.txt` already names the sitemap.
+3. **Old host.** `revifyearthh.netlify.app` 301s to the apex. There's no need to add it as a property.
+
+### After every release that changes pages
+
+1. Run *URL Inspection → Test live URL* on the homepage, one service page and every page the release touched. Check:
+   - "URL is available to Google";
+   - the user-declared canonical equals the URL;
+   - Google-selected canonical (shown after indexing) is the same;
+   - the page fetch is "Successful";
+   - the indexing allowed column says "Yes".
+2. Request indexing only for pages that are new or substantially changed. Re-requesting unchanged pages does nothing.
+3. **Rich Results Test** on `/`, `/services` and one service page, and **validator.schema.org** on `/team`. Expect no errors. Valid markup does **not** guarantee a rich result: Organization, Service and WebPage generally produce none. The test proves the markup parses.
+
+### Ongoing monitoring cadence
+
+| When | Where | What to look at | Act when |
+|---|---|---|---|
+| Weekly (first 2 months), then monthly | *Indexing → Pages* | Indexed vs not indexed; the reasons | An intended page sits in "Crawled – currently not indexed" or "Duplicate, Google chose different canonical" for over 4 weeks |
+| Monthly | *Performance → Search results* | Queries and pages by impressions, CTR and position | A page ranks for a query another page owns (cannibalisation: check `topics.ts`), or a high-impression page has low CTR (revisit its title or description) |
+| Monthly | *Experience → Core Web Vitals* | Field LCP, INP, CLS (mobile first) | Any URL group is "Poor" or "Needs improvement". Field data appears only once there is enough real traffic. |
+| Monthly | *Enhancements / Shopping / etc.* | Structured-data reports, if any appear | Any error |
+| Quarterly | This document and `topics.ts` | Whether the topic map still matches what pages actually rank for | Ranking pages diverge from the owners in the map |
+| Every reporting season | Any page or article citing GRI, BRSR or SEBI | Regulatory accuracy and the "checked on" date | A framework or circular has changed |
+
+Keep lab measurements, field data (CrUX / Search Console) and Search Console coverage separate in any report. They answer different questions.
+
+### Content update policy
+
+- Change copy when it is inaccurate, unclear or no longer matches the service. Do not change it to chase a keyword.
+- A title or description change is a ranking event. Make one change at a time, note the date, and compare Search Console performance after 4–6 weeks.
+- Regulatory statements carry a source and a "checked on" date, and are re-checked every reporting season.
+- No new page without passing the D gate ("New topic pages: when one is justified").
+
+### New page checklist
+
+- [ ] Passes the D gate. Owns a cluster in `topics.ts` or supports one, and competes with no existing pillar.
+- [ ] Route added in `App.tsx` **and** an entry in `pageMeta` (`seo.ts`), with a unique title (≤ 65 characters) and description (≤ 175 characters).
+- [ ] One H1 that states the topic. No skipped heading levels.
+- [ ] Hero image added to `pageHeroes` in `seo.ts`, otherwise the wrong image is preloaded.
+- [ ] At least one contextual inbound link from related content. The build fails without one.
+- [ ] Linked from its cluster in `topics.ts` if it is a pillar or supporting page.
+- [ ] Structured data only for what the page visibly shows (see E). The build check passes.
+- [ ] Build passes. Then URL Inspection → live test after deploy.
+
+### Internal linking checklist
+
+- Anchor text names the destination ("Content review & gap assessment"), not "click here", and not the same exact-match phrase on every page.
+- One or two contextual links per section, where a reader would want them. No link lists, no footer keyword blocks, no hidden links.
+- Link to the owning page of a subject, not to a page that only mentions it.
+- Fragments (`#faqs`) must point at an id that renders. The build checks literal ones.
+
+### Structured-data checklist
+
+- Only types in `ALLOWED_TYPES`. Extending it needs a visible basis on the page.
+- Values mirror visible content or the head exactly. The build compares them.
+- Every `@id` and URL is on `https://revifyearth.com/`. Every reference resolves. Every image exists.
+- No Review, AggregateRating, FAQPage, Product, Event, LocalBusiness or Article without the real thing on the page.
+- `sameAs` only for official, verified profiles.
+
+### Image checklist
+
+- `ResponsiveImage` with an `ImageAsset` (WebP derivatives, real widths). Never a raw multi-MB source file.
+- `alt` describes the image or its function. Use `alt=""` for decorative backgrounds and for images whose text is already beside them.
+- Only the hero gets `priority`. Everything else lazy-loads.
+- New source photographs go in `attached_assets/source-imagery/`, with derivatives in `public/assets/revify/`. Keep file names stable: a rename breaks references and the preload map.
+
+### Redirect and 404 checklist
+
+- Removing a page: 301 its URL to the closest equivalent in `public/_redirects` **and** `netlify.toml` (they mirror each other), remove it from `App.tsx` and `pageMeta`, and fix inbound links. The link check lists them.
+- Never redirect to the homepage as a catch-all. A real 404 is better than a soft one.
+- Do not add trailing-slash rules: Netlify normalises them, and they loop.
+- After deploy, check `curl -sI <url>` returns the intended status (`200`, `301` with the right `location`, or `404`).
+
+### Release checklist
+
+Run before merging any change that touches pages, metadata or routing:
+
+1. `pnpm --filter @workspace/revifyearth run typecheck`
+2. `pnpm --filter @workspace/revifyearth build`. All SEO checks run inside the build: route coverage, unique metadata, topic map, internal links, structured data, output files.
+3. Deploy preview. For the homepage, `/services`, `/expertise`, `/resources`, one service page, `/team`, `/contact` and an unknown URL, check:
+   - the title and description;
+   - the canonical (none on the 404);
+   - robots (`noindex` only on the 404);
+   - the JSON-LD types;
+   - one H1;
+   - no console errors;
+   - working links and images;
+   - mobile layout;
+   - status 404 on the unknown URL.
+4. After merge and production deploy: the URL Inspection live test on changed pages, and the Rich Results Test on representative pages.

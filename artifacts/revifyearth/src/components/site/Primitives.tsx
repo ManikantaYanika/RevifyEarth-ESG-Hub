@@ -9,10 +9,17 @@ export function Logo({ light = false }: { light?: boolean }) {
   return (
     // `min-h-11` gives the home link a 44px target without moving the mark: every
     // container it sits in centres its row, and the mark is only 36px tall.
-    <Link href="/" className="focus-ring flex min-h-11 items-center gap-3 rounded-sm" data-testid="link-logo">
+    // The wordmark beside the mark already says the name, so the image is decorative
+    // and the link is named once, as a destination ("RevifyEarth home").
+    <Link
+      href="/"
+      aria-label="RevifyEarth home"
+      className="focus-ring flex min-h-11 items-center gap-3 rounded-sm"
+      data-testid="link-logo"
+    >
       <img
         src={brandMark}
-        alt="RevifyEarth"
+        alt=""
         width={36}
         height={36}
         className={`h-9 w-9 object-contain ${light ? '' : 'brightness-0 saturate-100 invert-[.85]'}`}
