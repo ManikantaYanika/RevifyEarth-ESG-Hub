@@ -10,7 +10,7 @@ export function About() {
   return (
     <>
       <PageHero
-        eyebrow="The proposition"
+        eyebrow="About RevifyEarth"
         title={
           <>
             The work behind
@@ -18,7 +18,7 @@ export function About() {
             <em>the story.</em>
           </>
         }
-        intro={`${company.legalName} is an ESG branding and sustainability communication partner. We make complex sustainability information useful, credible and memorable.`}
+        intro={`${company.legalName} is an India-focused ESG branding and sustainability communication partner. We make complex sustainability information useful, credible and memorable.`}
         image={media.forestMist}
       />
 
@@ -112,8 +112,9 @@ export function About() {
               published openings at present — if the work resonates, write to us and tell us what you would want to
               build here.
             </p>
-            <div className="mt-9">
+            <div className="mt-9 flex flex-wrap gap-x-10">
               <ArrowLink href="/contact">Introduce yourself</ArrowLink>
+              <ArrowLink href="/team">Meet the team</ArrowLink>
             </div>
           </div>
         </div>

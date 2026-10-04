@@ -73,21 +73,21 @@ export function MethodologyTimeline() {
                       <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
                     </button>
                   </h3>
-                  {open && (
-                    <div id={`phase-${phase.index}`} className="border-l-2 border-[#a8c95a] pb-7 pl-6">
-                      <p className="max-w-2xl text-sm leading-7 text-[#3d5a5f]">{phase.detail}</p>
-                      <ul className="mt-5 flex flex-wrap gap-2">
-                        {phase.steps.map((step) => (
-                          <li
-                            key={step}
-                            className="border border-[#b8c9bd] px-3 py-2 font-mono-custom text-xs text-[#24626b] lg:text-[10px]"
-                          >
-                            {step}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                  {/* Rendered while closed, under `hidden`: every phase's detail is in
+                      the page a crawler reads, and aria-controls always resolves. */}
+                  <div id={`phase-${phase.index}`} hidden={!open} className="border-l-2 border-[#a8c95a] pb-7 pl-6">
+                    <p className="max-w-2xl text-sm leading-7 text-[#3d5a5f]">{phase.detail}</p>
+                    <ul className="mt-5 flex flex-wrap gap-2">
+                      {phase.steps.map((step) => (
+                        <li
+                          key={step}
+                          className="border border-[#b8c9bd] px-3 py-2 font-mono-custom text-xs text-[#24626b] lg:text-[10px]"
+                        >
+                          {step}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               );
             })}

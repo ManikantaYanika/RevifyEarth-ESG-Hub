@@ -76,8 +76,9 @@ export function Industries() {
           ))}
         </div>
 
-        <div className="mt-12">
+        <div className="mt-12 flex flex-wrap gap-x-10">
           <ArrowLink href="/contact">Discuss your sector</ArrowLink>
+          <ArrowLink href="/services/content-review">How a disclosure review works</ArrowLink>
         </div>
       </section>
 

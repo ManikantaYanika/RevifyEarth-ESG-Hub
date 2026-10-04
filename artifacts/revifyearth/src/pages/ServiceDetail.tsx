@@ -2,7 +2,7 @@ import { ArrowUpRight, Check } from 'lucide-react';
 import { Link } from 'wouter';
 
 import { serviceBySlug, type Service } from '@/data/services';
-import { ActionButton, SectionLabel } from '@/components/site/Primitives';
+import { ActionButton, ArrowLink, SectionLabel } from '@/components/site/Primitives';
 import { PageHero } from '@/components/site/PageHero';
 import { Reveal } from '@/components/site/Reveal';
 import { CtaBand } from '@/components/sections/Bands';
@@ -24,6 +24,7 @@ export function ServiceDetail({ slug }: { slug: string }) {
         intro={service.tagline}
         image={service.image}
         dark
+        eyebrowInHeading={false}
       >
         <div className="mt-8 flex flex-wrap gap-3">
           <ActionButton href="/contact" variant="accent" icon={<ArrowUpRight className="h-3.5 w-3.5" />}>
@@ -99,7 +100,7 @@ export function ServiceDetail({ slug }: { slug: string }) {
       <section className="mx-auto max-w-[1440px] px-5 py-16 sm:py-20 md:px-10 md:py-32">
         <div className="grid gap-12 lg:grid-cols-[1.2fr_.8fr]">
           <div>
-            <SectionLabel>Deliverables</SectionLabel>
+            <SectionLabel as="h2">Deliverables</SectionLabel>
             <ul className="grid gap-px border border-[#b8c9bd] bg-[#b8c9bd] sm:grid-cols-2">
               {service.deliverables.map((item) => (
                 <li key={item} className="flex gap-3 bg-[#f2f0e8] p-5 text-sm leading-6 text-[#3d5a5f]">
@@ -111,7 +112,7 @@ export function ServiceDetail({ slug }: { slug: string }) {
           </div>
 
           <div>
-            <SectionLabel>Timeline &amp; fit</SectionLabel>
+            <SectionLabel as="h2">Timeline &amp; fit</SectionLabel>
             <div className="border-l-2 border-[#a8c95a] pl-6">
               <p className="text-sm leading-7 text-[#3d5a5f]">{service.timeline}</p>
               <p className="eyebrow mt-8 text-[#24626b]">Ideal clients</p>
@@ -125,6 +126,9 @@ export function ServiceDetail({ slug }: { slug: string }) {
                   </li>
                 ))}
               </ul>
+              <div className="mt-8">
+                <ArrowLink href="/process">How the engagement runs</ArrowLink>
+              </div>
             </div>
           </div>
         </div>

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'wouter';
 
 import { anchorPosition, scrollToTarget } from '@/animations/scroll/lenis';
-import { organizationJsonLd, resolvePageSeo, socialImageUrl } from '@/data/seo';
+import { resolvePageSeo, socialImageUrl } from '@/data/seo';
 
 /** Keyboard users land here first; the target lives on the main element. */
 export function SkipLink() {
@@ -178,14 +178,16 @@ export function PageMeta() {
     if (seo.canonical) upsertLink('canonical', seo.canonical);
     else removeHeadElement('link[rel="canonical"]');
 
-    let script = document.head.querySelector<HTMLScriptElement>('script[data-jsonld="organization"]');
+    // The same @graph the build wrote into this route's HTML: Organization always,
+    // plus WebSite on the homepage and Service on a service page.
+    let script = document.head.querySelector<HTMLScriptElement>('script[data-jsonld="page"]');
     if (!script) {
       script = document.createElement('script');
       script.type = 'application/ld+json';
-      script.dataset.jsonld = 'organization';
+      script.dataset.jsonld = 'page';
       document.head.appendChild(script);
     }
-    script.textContent = JSON.stringify(organizationJsonLd);
+    script.textContent = JSON.stringify(seo.structuredData);
   }, [location]);
 
   return null;

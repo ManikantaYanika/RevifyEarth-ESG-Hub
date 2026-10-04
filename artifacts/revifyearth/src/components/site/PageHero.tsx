@@ -12,10 +12,23 @@ interface PageHeroProps {
   intro: string;
   image?: ImageAsset;
   dark?: boolean;
+  /**
+   * Make the eyebrow part of the h1. Off where the eyebrow is only a label and the
+   * headline already names the topic (a service page's "Service 02").
+   */
+  eyebrowInHeading?: boolean;
   children?: ReactNode;
 }
 
-export function PageHero({ eyebrow, title, intro, image, dark = false, children }: PageHeroProps) {
+export function PageHero({
+  eyebrow,
+  title,
+  intro,
+  image,
+  dark = false,
+  eyebrowInHeading = true,
+  children,
+}: PageHeroProps) {
   const heroRef = useRef<HTMLElement>(null);
   useHeroEntrance(heroRef);
 
@@ -44,15 +57,35 @@ export function PageHero({ eyebrow, title, intro, image, dark = false, children 
         data-hero="content"
       >
         <div className="max-w-4xl">
-          <p className={`eyebrow mb-7 ${dark ? 'text-[#a8c95a]' : ''}`} data-hero="eyebrow">
-            {eyebrow}
-          </p>
-          <h1
-            className="font-display wrap-break-word text-[clamp(2.9rem,8vw,8rem)] leading-[.88] tracking-[-.055em]"
-            data-hero="title"
-          >
-            {title}
-          </h1>
+          {eyebrowInHeading ? (
+            // The eyebrow is the first line of the h1 rather than a paragraph above it:
+            // it names the page topic ("ESG reporting expertise") while the headline is
+            // the brand line, so the heading needs both. Each span keeps the classes and
+            // motion hook its element had, so rendering and the entrance are unchanged.
+            <h1>
+              <span className={`eyebrow mb-7 block ${dark ? 'text-[#a8c95a]' : ''}`} data-hero="eyebrow">
+                {eyebrow}
+              </span>{' '}
+              <span
+                className="font-display block wrap-break-word text-[clamp(2.9rem,8vw,8rem)] leading-[.88] tracking-[-.055em]"
+                data-hero="title"
+              >
+                {title}
+              </span>
+            </h1>
+          ) : (
+            <>
+              <p className={`eyebrow mb-7 ${dark ? 'text-[#a8c95a]' : ''}`} data-hero="eyebrow">
+                {eyebrow}
+              </p>
+              <h1
+                className="font-display wrap-break-word text-[clamp(2.9rem,8vw,8rem)] leading-[.88] tracking-[-.055em]"
+                data-hero="title"
+              >
+                {title}
+              </h1>
+            </>
+          )}
         </div>
         <div data-hero="copy">
           <p className={`max-w-sm text-sm leading-7 ${dark ? 'text-white/80' : 'text-[#3d5a5f]'}`}>{intro}</p>
