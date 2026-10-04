@@ -18,7 +18,10 @@
  *   - sitemap.xml generated from the same route list
  *   - _redirects  route rewrites injected at the `# @seo-routes` marker
  *
- * The build fails if App.tsx declares a route with no SEO entry, or the reverse.
+ * The build fails if App.tsx declares a route with no SEO entry, or the reverse;
+ * if the topic map (src/data/topics.ts) points at a route that is not indexable or
+ * gives a page two subjects to own; or if any page's JSON-LD fails
+ * ./structured-data-check.ts.
  * Flat `about.html` files (not `about/index.html`) are deliberate: a directory
  * index invites the host to redirect `/about` to `/about/`.
  */
@@ -36,6 +39,8 @@ import {
   type PageSeo,
 } from '../src/data/seo';
 import { services } from '../src/data/services';
+import { serviceContextLinks, topicClusters } from '../src/data/topics';
+import { assertStructuredData } from './structured-data-check';
 
 const EXPECTED_ORIGIN = 'https://revifyearth.com';
 const ROUTES_MARKER = '# @seo-routes';
@@ -171,6 +176,44 @@ function assertDistinctMetadata(pages: readonly PageSeo[], warn: (message: strin
   }
 }
 
+/**
+ * The topic map is the site's search architecture: one owning page per subject.
+ * Every link it makes must land on an indexable route, and no page may own two
+ * subjects — that is the cannibalisation the map exists to prevent.
+ */
+function assertTopicMap(): void {
+  const problems: string[] = [];
+  const indexable = new Set(indexableRoutes);
+  const routeOf = (href: string) => href.split('#', 1)[0] || '/';
+  const checkLink = (where: string, link: { href: string; label: string }) => {
+    if (!indexable.has(routeOf(link.href))) problems.push(`${where} links to ${link.href}, which is not an indexable route`);
+    if (!link.label.trim()) problems.push(`${where} has a link with no label`);
+  };
+
+  const ids = new Set<string>();
+  const pillars = new Map<string, string>();
+  for (const cluster of topicClusters) {
+    if (ids.has(cluster.id)) problems.push(`topic "${cluster.id}" is declared twice`);
+    ids.add(cluster.id);
+    checkLink(`topic "${cluster.id}" pillar`, cluster.pillar);
+    const pillarRoute = routeOf(cluster.pillar.href);
+    const owner = pillars.get(pillarRoute);
+    if (owner) problems.push(`${pillarRoute} is the pillar of both "${owner}" and "${cluster.id}"`);
+    pillars.set(pillarRoute, cluster.id);
+    for (const link of cluster.supporting) {
+      checkLink(`topic "${cluster.id}"`, link);
+      if (routeOf(link.href) === pillarRoute) problems.push(`topic "${cluster.id}" lists its own pillar as supporting`);
+    }
+  }
+  const slugs = new Set(services.map((service) => service.slug));
+  for (const [slug, link] of Object.entries(serviceContextLinks)) {
+    if (!slugs.has(slug)) problems.push(`serviceContextLinks has an entry for unknown service "${slug}"`);
+    checkLink(`serviceContextLinks["${slug}"]`, link);
+    if (routeOf(link.href) === `/services/${slug}`) problems.push(`serviceContextLinks["${slug}"] links to its own page`);
+  }
+  if (problems.length) throw new Error(`seo-prerender: topic map check failed:\n  - ${problems.join('\n  - ')}`);
+}
+
 function renderSitemap(pages: readonly PageSeo[]): string {
   const urls = pages.map((page) => `  <url><loc>${escapeHtml(page.canonical!)}</loc></url>`).join('\n');
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
@@ -204,6 +247,12 @@ export function seoPrerender(): Plugin {
       const appSource = readFileSync(path.resolve(config.root, 'src/App.tsx'), 'utf8');
       assertCoverage(discoverAppRoutes(appSource));
       assertDistinctMetadata(routeSeo, (message) => config.logger.warn(message));
+      assertTopicMap();
+      try {
+        assertStructuredData(routeSeo, notFoundSeo);
+      } catch (error) {
+        this.error(`seo-prerender: ${(error as Error).message}`);
+      }
 
       const index = bundle['index.html'];
       if (!index || index.type !== 'asset') this.error('seo-prerender: index.html is missing from the bundle.');
@@ -241,6 +290,11 @@ export function seoPrerender(): Plugin {
         try {
           const data = JSON.parse(block ?? '');
           if (data['@context'] !== 'https://schema.org' || !Array.isArray(data['@graph'])) throw new Error('shape');
+          // Every image the markup names (logo, portraits) must be a file that ships.
+          for (const [, url] of (block ?? '').matchAll(/"(?:logo|image)":"([^"]+)"/g)) {
+            const local = path.join(outDir, new URL(url).pathname);
+            if (!existsSync(local)) problems.push(`${fileName} JSON-LD names ${url}, which is not in the build`);
+          }
         } catch {
           problems.push(`${fileName} has missing or invalid JSON-LD`);
         }

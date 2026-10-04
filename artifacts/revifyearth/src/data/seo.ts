@@ -1,4 +1,4 @@
-import { company } from './company';
+import { company, designTeam, foundingTeam, type TeamMember } from './company';
 import { serviceBySlug, services, type Service } from './services';
 
 export interface PageMetaEntry {
@@ -7,8 +7,9 @@ export interface PageMetaEntry {
 }
 
 /*
- * Search intent by route (Phase C keyword map). Each page owns one primary topic so
- * pages do not compete with each other:
+ * Search intent by route. Each page owns one primary topic so pages do not compete
+ * with each other; the subject clusters and which page owns each are in ./topics.ts
+ * (Phase D), and the build checks that map against the routes below.
  *   /                          brand + ESG reporting & sustainability communication (India)
  *   /about                     the company: who RevifyEarth is
  *   /services                  the service catalogue as a whole
@@ -19,7 +20,7 @@ export interface PageMetaEntry {
  *   /process                   delivery phases and timeline
  *   /team                      the people
  *   /projects                  how an engagement is assembled (no case studies yet)
- *   /resources                 FAQs and reference material
+ *   /resources                 FAQs, perspectives and the topic guide
  *   /contact                   start an enquiry
  * Titles and descriptions must stay unique; the build fails on a duplicate.
  */
@@ -72,12 +73,12 @@ const base: Record<string, PageMetaEntry> = {
   '/resources': {
     title: 'ESG Reporting Resources & FAQs — RevifyEarth',
     description:
-      'Answers on scope, timelines and frameworks for teams preparing a sustainability report, with perspectives on GRI and BRSR disclosure quality and reporting practice.',
+      'Answers on scope, timelines and frameworks for teams preparing a sustainability report, perspectives on disclosure quality, and a guide to where each topic is covered.',
   },
   '/contact': {
     title: 'Contact RevifyEarth — Discuss Your Sustainability Report',
     description:
-      'Talk to RevifyEarth about your sustainability report, BRSR or GRI disclosures, ESG communication, video report or report webpage. Engagements are scoped to the brief.',
+      'Talk to RevifyEarth about your sustainability report, a disclosure review, ESG communication, a video report or a report webpage. Engagements are scoped to the brief.',
   },
 };
 
@@ -177,26 +178,46 @@ export interface PageSeo {
 export const canonicalUrl = (path: string): string => `${SITE_ORIGIN}${path === '/' ? '/' : path}`;
 
 /* ---------------------------------------------------------------------------------
- * Structured data. Only entities the page genuinely is or describes: the company on
- * every page, the website on the homepage, and a Service on each service page. No
- * reviews, ratings, FAQ or breadcrumb markup — the site shows no ratings, FAQ rich
- * results are not offered for this kind of site, and there is no visible breadcrumb
- * for BreadcrumbList to mirror.
+ * Structured data (SEO Phase E). Only entities the page genuinely is or shows:
+ *   every page      the company (Organization), and the page itself (WebPage or a
+ *                   subtype) tied to the site and the company
+ *   /               the website (WebSite), which names the site in search results
+ *   /services       the seven services as an ItemList, mirroring the visible list
+ *   /services/<x>   the Service the page describes, as the page's main entity
+ *   /team           a Person for each person pictured, with their visible role and bio
+ * No reviews, ratings, FAQ, breadcrumb or article markup: the site shows no ratings,
+ * FAQ rich results are not offered for this kind of site, there is no visible
+ * breadcrumb for BreadcrumbList to mirror, and there are no articles yet.
+ *
+ * Nodes refer to each other by @id. A node is defined in full wherever it appears and
+ * must be identical everywhere; the build checks that, plus that every reference
+ * resolves and every value mirrors the head and the visible page
+ * (vite-plugins/structured-data-check.ts).
  * ------------------------------------------------------------------------------- */
 
 export type StructuredData = Readonly<Record<string, unknown>>;
 
-const ORGANIZATION_ID = `${SITE_ORIGIN}/#organization`;
-const WEBSITE_ID = `${SITE_ORIGIN}/#website`;
+export const ORGANIZATION_ID = `${SITE_ORIGIN}/#organization`;
+export const WEBSITE_ID = `${SITE_ORIGIN}/#website`;
+export const webPageId = (path: string): string => `${canonicalUrl(path)}#webpage`;
+export const serviceId = (slug: string): string => `${canonicalUrl(`/services/${slug}`)}#service`;
+export const personId = (name: string): string =>
+  `${canonicalUrl('/team')}#${name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
 
+const LANGUAGE = 'en';
 const india = { '@type': 'Country', name: 'India' } as const;
 
-/** The company. Facts only from src/data/company.ts. */
+/**
+ * The company. Facts only from src/data/company.ts. `name` is the brand people search
+ * for and see on every page; the registered name is `legalName`. "Revify" is how the
+ * site's own copy refers to the company ("Why Revify").
+ */
 const organizationJsonLd: StructuredData = {
   '@type': 'Organization',
   '@id': ORGANIZATION_ID,
-  name: company.legalName,
-  alternateName: company.brand,
+  name: company.brand,
+  legalName: company.legalName,
+  alternateName: 'Revify',
   url: canonicalUrl('/'),
   logo: `${SITE_ORIGIN}/favicon-192.png`,
   email: company.email,
@@ -219,15 +240,26 @@ const websiteJsonLd: StructuredData = {
   '@id': WEBSITE_ID,
   url: canonicalUrl('/'),
   name: company.brand,
-  alternateName: company.legalName,
-  inLanguage: 'en',
+  alternateName: 'Revify',
+  inLanguage: LANGUAGE,
   publisher: { '@id': ORGANIZATION_ID },
 };
+
+/** schema.org has specific page types for these; every other route is a WebPage. */
+const pageTypes: Readonly<Record<string, string>> = {
+  '/about': 'AboutPage',
+  '/contact': 'ContactPage',
+  '/services': 'CollectionPage',
+  '/resources': 'CollectionPage',
+};
+
+/** Pages whose subject is the company itself rather than one of its services. */
+const aboutTheCompany = new Set(['/', '/about', '/team', '/contact']);
 
 /** A service page. Name and description are the visible title and opening paragraph. */
 const serviceJsonLd = (service: Service): StructuredData => ({
   '@type': 'Service',
-  '@id': `${canonicalUrl(`/services/${service.slug}`)}#service`,
+  '@id': serviceId(service.slug),
   name: service.title,
   serviceType: service.title,
   description: service.overview[0],
@@ -236,12 +268,60 @@ const serviceJsonLd = (service: Service): StructuredData => ({
   areaServed: india,
 });
 
-/** The JSON-LD graph for a canonical route path, or for the not-found page (null). */
+/** /services: the visible service list, in the order the page shows it. */
+const serviceListJsonLd: StructuredData = {
+  '@type': 'ItemList',
+  name: 'ESG and sustainability reporting services',
+  numberOfItems: services.length,
+  itemListElement: services.map((service, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: service.title,
+    url: canonicalUrl(`/services/${service.slug}`),
+  })),
+};
+
+/** /team: each person as pictured — name, the role shown under the portrait, the bio when there is one. */
+const personJsonLd = (member: TeamMember): StructuredData => ({
+  '@type': 'Person',
+  '@id': personId(member.name),
+  name: member.name,
+  jobTitle: member.role,
+  ...(member.bio ? { description: member.bio } : {}),
+  image: `${SITE_ORIGIN}/assets/revify/${member.image.base}-${member.image.widths[member.image.widths.length - 1]}.webp`,
+  worksFor: { '@id': ORGANIZATION_ID },
+});
+
+export const teamMembers: readonly TeamMember[] = [...foundingTeam, ...designTeam];
+
+/** The page itself: what it is, which site it belongs to and what it is about. */
+const webPageJsonLd = (path: string, entry: PageMetaEntry, service: Service | undefined): StructuredData => ({
+  '@type': pageTypes[path] ?? 'WebPage',
+  '@id': webPageId(path),
+  url: canonicalUrl(path),
+  name: entry.title,
+  description: entry.description,
+  inLanguage: LANGUAGE,
+  isPartOf: { '@id': WEBSITE_ID },
+  ...(aboutTheCompany.has(path) ? { about: { '@id': ORGANIZATION_ID } } : {}),
+  ...(service ? { mainEntity: { '@id': serviceId(service.slug) } } : {}),
+  ...(path === '/services' ? { mainEntity: serviceListJsonLd } : {}),
+});
+
+/**
+ * The JSON-LD graph for a canonical route path, or for the not-found page (null),
+ * which carries only the company: it has no canonical URL to describe.
+ */
 export function structuredDataFor(path: string | null): StructuredData {
   const graph: StructuredData[] = [organizationJsonLd];
-  if (path === '/') graph.push(websiteJsonLd);
-  const service = path?.startsWith('/services/') ? serviceBySlug(path.slice('/services/'.length)) : undefined;
-  if (service) graph.push(serviceJsonLd(service));
+  if (path !== null) {
+    const entry = pageMeta[path];
+    const service = path.startsWith('/services/') ? serviceBySlug(path.slice('/services/'.length)) : undefined;
+    if (path === '/') graph.push(websiteJsonLd);
+    graph.push(webPageJsonLd(path, entry, service));
+    if (service) graph.push(serviceJsonLd(service));
+    if (path === '/team') graph.push(...teamMembers.map(personJsonLd));
+  }
   return { '@context': 'https://schema.org', '@graph': graph };
 }
 

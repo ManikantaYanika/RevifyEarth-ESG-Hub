@@ -2,6 +2,7 @@ import { ArrowUpRight, Check } from 'lucide-react';
 import { Link } from 'wouter';
 
 import { serviceBySlug, type Service } from '@/data/services';
+import { serviceContextLinks } from '@/data/topics';
 import { ActionButton, ArrowLink, SectionLabel } from '@/components/site/Primitives';
 import { PageHero } from '@/components/site/PageHero';
 import { Reveal } from '@/components/site/Reveal';
@@ -15,6 +16,7 @@ import { NotFound } from './NotFound';
 export function ServiceDetail({ slug }: { slug: string }) {
   const service = serviceBySlug(slug);
   if (!service) return <NotFound />;
+  const context = serviceContextLinks[service.slug];
 
   return (
     <>
@@ -126,8 +128,10 @@ export function ServiceDetail({ slug }: { slug: string }) {
                   </li>
                 ))}
               </ul>
-              <div className="mt-8">
+              <div className="mt-8 flex flex-wrap gap-x-10">
                 <ArrowLink href="/process">How the engagement runs</ArrowLink>
+                {/* Up to the page that owns this service's wider subject (src/data/topics.ts). */}
+                {context && <ArrowLink href={context.href}>{context.label}</ArrowLink>}
               </div>
             </div>
           </div>

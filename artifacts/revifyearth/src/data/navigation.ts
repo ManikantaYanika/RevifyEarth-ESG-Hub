@@ -25,7 +25,7 @@ export const navGroups: readonly NavGroup[] = [
     intro: 'One sustainability narrative, carried consistently across every stakeholder touchpoint.',
     links: [
       { label: 'ESG Strategy & Advisory', href: '/expertise', summary: 'Framework alignment, disclosure quality and reporting direction.' },
-      { label: 'Sustainability Reporting', href: '/services/report-design', summary: 'Editorial systems, data visualisation and narrative architecture.' },
+      { label: 'ESG Report Design', href: '/services/report-design', summary: 'Editorial systems, data visualisation and narrative architecture.' },
       { label: 'ESG Branding', href: '/sustainability-branding', summary: 'One identity across report, print, board, film and web.' },
       { label: 'ESG Websites', href: '/services/webpage-development', summary: 'A responsive digital home for the reporting year.' },
       { label: 'Video Reports', href: '/services/video-report', summary: 'A 5–7 minute visual narrative built from the approved report.' },
@@ -64,7 +64,7 @@ export const navGroups: readonly NavGroup[] = [
     href: '/resources',
     intro: 'Reference material for teams preparing a reporting cycle.',
     links: [
-      { label: 'Case Studies', href: '/projects', summary: 'How an integrated engagement comes together.' },
+      { label: 'Engagement Model', href: '/projects', summary: 'How an integrated engagement comes together.' },
       { label: 'Insights', href: '/resources#insights', summary: 'Perspectives on disclosure quality and reporting practice.' },
       { label: 'Frameworks We Work Across', href: '/expertise#frameworks', summary: 'GRI, BRSR and the UN Sustainable Development Goals.' },
       { label: 'FAQs', href: '/resources#faqs', summary: 'Scope, timelines, inclusions and what we need from you.' },
