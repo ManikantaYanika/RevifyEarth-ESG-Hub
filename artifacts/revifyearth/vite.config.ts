@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, type UserConfig } from 'vite';
 
+import { seoPrerender } from './vite-plugins/seo-prerender';
+
 const DEFAULT_DEV_PORT = 5173;
 
 /**
@@ -55,6 +57,9 @@ export default defineConfig(async ({ command }): Promise<UserConfig> => {
     plugins: [
       react(),
       tailwindcss(),
+      // Build only: one HTML file per route with its own head, a noindex 404.html,
+      // the sitemap and the route rewrites in _redirects. See the plugin header.
+      seoPrerender(),
       // Every Replit plugin is loaded dynamically and only when serving. They are
       // dev tooling — an error modal, a source mapper, a banner — with nothing to
       // contribute to a production bundle, and all three live in devDependencies.
